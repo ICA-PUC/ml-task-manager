@@ -17,12 +17,11 @@ class RemoteHandler:
         self.client.load_system_host_keys()
         self.client.set_missing_host_key_policy(AutoAddPolicy())
 
-    def _assert_integrity(self, filename):
+    def _assert_integrity(self, local_path, remote_path):
         """Assert local and remote file integrity"""
-        filepath = f"app/tmp/{filename}"
-        with open(filepath, 'r', encoding='utf-8') as f:
+        with open(local_path, 'r', encoding='utf-8') as f:
             local_hash = hashlib.md5(str(f.read()).encode('utf-8')).hexdigest()
-        self.exec(f"md5sum /tmp/{filename}")
+        self.exec(f"md5sum {remote_path}")
         remote_hash = self.get_output()[0]
         remote_hash = remote_hash.split(" ")[0]
         if local_hash == remote_hash:
@@ -58,5 +57,5 @@ class RemoteHandler:
         remote_path = f"{root}/uploads/{filename}"
         scp.put(local_path, remote_path)
         scp.close()
-        sanity_check = self._assert_integrity(filename)
+        sanity_check = self._assert_integrity(local_path, remote_path)
         return sanity_check
