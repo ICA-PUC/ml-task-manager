@@ -2,6 +2,7 @@
 import hashlib
 from paramiko import SSHClient, AutoAddPolicy
 from scp import SCPClient
+from ...config import settings
 
 
 class RemoteHandler:
@@ -50,10 +51,11 @@ class RemoteHandler:
         stderr = self.stderr.read().decode('utf8')
         return stdout, stderr
 
-    def send_file(self, filename, remote_path):
+    def send_file(self, filename, local_path):
         """Send file via scp"""
         scp = SCPClient(self.client.get_transport())
-        local_path = f"app/tmp/{filename}"
+        root = settings.atena_root
+        remote_path = f"{root}/uploads/{filename}"
         scp.put(local_path, remote_path)
         scp.close()
         sanity_check = self._assert_integrity(filename)

@@ -13,7 +13,7 @@ def prep_template(job_params):
     """Prepare template with job parameters"""
     if "atena" in job_params['runner_location']:
         template = read_template("app/controllers/slurm/slurm_template.srm")
-    else:
+    elif "dev" in job_params['runner_location']:
         template = read_template("app/controllers/slurm/dev_template.srm")
     slurm_script = template.format(
         experiment_name=job_params['experiment_name'],
