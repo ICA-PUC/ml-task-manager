@@ -41,8 +41,6 @@ def atena_connect():
     host = "atn1mg4"
     user = settings.env_confs['ATENA_USER']
     passwd = settings.env_confs['ATENA_PASSWD']
-    print("Atena user:", user)
-    print("Atena pass:", passwd)
     remote.connect(host, user, passwd)
     return remote
 
