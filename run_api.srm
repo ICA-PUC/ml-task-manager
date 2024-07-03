@@ -15,10 +15,10 @@ echo "JOB NODELIST": $SLURM_JOB_NODELIST
 echo "JOB ID: " $SLURM_JOBID
 echo "JOB NAME: " $SLURM_JOB_NAME
 
-export ROOT_API=/nethome/projetos30/arcabouco_ml/lucas/ml-task-manager
 export ATENA_ROOT=/nethome/projetos30/arcabouco_ml
+export ROOT_API=$ATENA_ROOT/lucas/ml-task-manager
 export SIF_PATH=/nethome/projetos30/arcabouco_ml/singularities/
 
-singularity run -B $ROOT_API:$ROOT_API $SIF_PATH/api.sif sh $ROOT_API/run_api.sh --port 8008 --host 0.0.0.0
+singularity run -B $ATENA_ROOT:$ATENA_ROOT $SIF_PATH/api.sif sh $ROOT_API/run_api.sh --port 8008 --host 0.0.0.0
 
 echo "run_api.srm finished."
