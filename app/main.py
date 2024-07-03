@@ -74,6 +74,14 @@ def create_atena_task(pyname, task):
     srm_name = prep_template(task)
     srm_path = atena_upload(srm_name, remote)
     remote.exec(f"sbatch {srm_path}")
+    output = remote.get_output()
+    remote.close()
+    return output
+
+
+def create_dev_task(pyname, task):
+    """Create and submit a new task to dev"""
+    return 1
 
 
 @app.post("/new_task/")
@@ -97,16 +105,13 @@ async def create_task(files: list[UploadFile]):
             "status": status.HTTP_400_BAD_REQUEST
         }
     if "atena" in task['runner_location']:
-        create_atena_task(py_name, task)
-    else:
-        pass
-    remote = atena_connect()
-    output = remote.get_output()
+        output = create_atena_task(py_name, task)
+    elif "dev" in task['runner_location']:
+        output = create_dev_task(py_name, task)
     if output[0]:
         job_id = output[0].split('Submitted batch job ')[1][:-1]
     elif output[1]:
         return {"msg": output[1]}
-    remote.close()
     task['job_id'] = job_id
     with Session(engine) as session:
         db_task = Task.model_validate(task)
