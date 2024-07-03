@@ -9,7 +9,6 @@ services:
     environment:
       - DATABASE_URL=postgresql://ml-task-manager:ml-task-manager@db:5432/ml-task-manager
       - DEBUG=1
-      - FOLDER=.
     depends_on:
       - db
   db:
