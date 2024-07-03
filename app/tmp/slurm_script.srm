@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH -J {experiment_name}   #Nome job
-#SBATCH -p {instance_type}     #Fila (partition) a ser utilizada
-#SBATCH --account={account}
+#SBATCH -J atena_test   #Nome job
+#SBATCH -p cpu     #Fila (partition) a ser utilizada
+#SBATCH --account=twinscie
 #SBATCH --nodes=1               #Numero de Nós
 #SBATCH --ntasks-per-node=1     #Numero de tarefas por Nó
 #SBATCH --ntasks=1              #Numero de tarefas
@@ -16,4 +16,4 @@ JOBNAME=$SLURM_JOB_NAME
 echo "JOBNAME: " $JOBNAME
 
 # TODO: check if container.sif exists
-singularity run $SIF_PATH/{image_name}.sif python3 $ATENA_ROOT/scripts/{script_name} input_path=$ATENA_ROOT/datasets/{dataset_name} output_path=$ATENA_ROOT/output
+singularity run $SIF_PATH/sklearn_sample_latest.sif python3 $ATENA_ROOT/scripts/test.py input_path=$ATENA_ROOT/datasets/adult.csv output_path=$ATENA_ROOT/output
