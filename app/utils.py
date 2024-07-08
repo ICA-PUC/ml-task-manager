@@ -1,16 +1,19 @@
 """Utility functions module"""
 import hashlib
 import json
+from .config import settings
 
 
 def save_file(filename: str, filedata: bin) -> str:
     """Save file to disk"""
-    fpath = f"app/tmp/{filename}"
+    root = settings.atena_root
+    fpath = f"{root}/scripts/{filename}"
+
     if isinstance(filedata, str):
         filedata = filedata.encode('utf-8')
     with open(fpath, 'wb') as f:
         f.write(filedata)
-        with open(f"app/tmp/{filename}.md5", "wb") as f:
+        with open(f"{fpath}.md5", "wb") as f:
             hashmd5 = hashlib.md5(filedata).hexdigest()
             f.write(hashmd5.encode())
     return fpath

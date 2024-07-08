@@ -2,7 +2,7 @@
 """
 from pydantic_settings import BaseSettings
 from pydantic import Field
-from dotenv import load_dotenv
+from dotenv import dotenv_values
 
 
 class Settings(BaseSettings):
@@ -11,9 +11,9 @@ class Settings(BaseSettings):
     :param BaseSettings: pydantic base settings class
     :type BaseSettings: class
     """
-    db_url: str = Field(validation_alias='DATABASE_URL')
-    folder: str = Field(validation_alias='FOLDER')
+    env_confs: dict = dotenv_values(".env", verbose=True)
+    db_url: str = env_confs["DATABASE_URL"]
+    atena_root: str = Field(validation_alias='ATENA_ROOT')
 
 
-load_dotenv()
 settings = Settings()

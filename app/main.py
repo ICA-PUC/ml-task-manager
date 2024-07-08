@@ -2,10 +2,9 @@
 import os
 import shutil
 from contextlib import asynccontextmanager
-# from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, status
 from sqlmodel import Session, SQLModel, create_engine, select
-from .models.task import Task, TaskRead
+from .models.task import Task
 from .utils import save_file, process_config, get_status_message
 from .utils import strip_filename
 from .controllers.ssh.handler import RemoteHandler
@@ -27,7 +26,6 @@ async def lifespan(app: FastAPI):
     """Lifespan function for initialization and shutting down functions"""
     # db.init_db()
     create_db_and_tables()
-    # load_dotenv()
     os.makedirs('app/tmp', exist_ok=True)
 
     yield
@@ -38,26 +36,17 @@ app = FastAPI(lifespan=lifespan)
 
 
 def atena_connect():
-    """Spawn new remote handler with atena config
-
-    :return: remote handler object connected to atena
-    :rtype: RemoteHandler
-    """
+    """Spawn new remote handler with atena config"""
     remote = RemoteHandler()
-    # adjust to the API's user
     host = "atn1mg4"
-    user = os.getenv('ATENA_USER')
-    passwd = os.getenv('ATENA_PASSWD')
+    user = settings.env_confs['ATENA_USER']
+    passwd = settings.env_confs['ATENA_PASSWD']
     remote.connect(host, user, passwd)
     return remote
 
 
 def dev_connect():
-    """Spawn new remote handler with dev config
-
-    :return: remote handler object connected to dev slurm
-    :rtype: RemoteHandler
-    """
+    """Spawn new remote handler with dev config"""
     remote = RemoteHandler()
     host = "slurmmanager"
     user = "admin"
@@ -66,19 +55,37 @@ def dev_connect():
     return remote
 
 
-def file_upload(fname, remote_path, remote):
+def atena_upload(fname, remote):
     """Submit job to atena cluster"""
-    sanity_check = remote.send_file(fname, remote_path)
+    root = settings.atena_root
+    file_path = f"{root}/scripts/{fname}"
+    sanity_check = remote.send_file(fname, file_path)
     if not sanity_check:
         return status.HTTP_500_INTERNAL_SERVER_ERROR
-    return status.HTTP_200_OK
+    return file_path
+
+
+def create_atena_task(pyname, task):
+    """Create and submit a new task to atena"""
+    remote = atena_connect()
+    atena_upload(pyname, remote)
+    srm_name = prep_template(task)
+    srm_path = atena_upload(srm_name, remote)
+    remote.exec(f"sbatch {srm_path}")
+    output = remote.get_output()
+    remote.close()
+    return output
+
+
+def create_dev_task(pyname, task):
+    """Create and submit a new task to dev"""
+    return 1
 
 
 @app.post("/new_task/")
 async def create_task(files: list[UploadFile]):
     """Create new task and save it to DB"""
     # TODO: Split this frankenstein into functions
-    root_folder = settings.folder
 
     for file in files:
         fname = file.filename
@@ -96,20 +103,13 @@ async def create_task(files: list[UploadFile]):
             "status": status.HTTP_400_BAD_REQUEST
         }
     if "atena" in task['runner_location']:
-        remote = atena_connect()
-    else:
-        remote = dev_connect()
-    file_upload(fname, task['script_path'], remote)
-    srm_name = prep_template(task)
-    srm_path = f"{root_folder}/{srm_name}"
-    file_upload(srm_name, srm_path, remote)
-    remote.exec(f"sbatch {srm_path}")
-    output = remote.get_output()
+        output = create_atena_task(py_name, task)
+    elif "dev" in task['runner_location']:
+        output = create_dev_task(py_name, task)
     if output[0]:
         job_id = output[0].split('Submitted batch job ')[1][:-1]
     elif output[1]:
         return {"msg": output[1]}
-    remote.close()
     task['job_id'] = job_id
     with Session(engine) as session:
         db_task = Task.model_validate(task)
