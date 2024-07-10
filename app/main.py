@@ -7,6 +7,7 @@ from sqlmodel import Session, SQLModel, create_engine, select
 from .models.task import Task
 from .utils import save_file, process_config, get_status_message
 from .utils import strip_filename
+from .utils import create_task_id
 from .controllers.ssh.handler import RemoteHandler
 from .controllers.slurm.slurm_manager import prep_template
 from .config import settings
@@ -102,6 +103,7 @@ async def create_task(files: list[UploadFile]):
             "msg": f"{script_name} and {py_name} must have same name",
             "status": status.HTTP_400_BAD_REQUEST
         }
+    task['id'] = create_task_id()
     if "atena" in task['runner_location']:
         output = create_atena_task(py_name, task)
     elif "dev" in task['runner_location']:
