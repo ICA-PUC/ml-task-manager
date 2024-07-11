@@ -8,7 +8,6 @@ def save_file(filename: str, filedata: bin) -> str:
     """Save file to disk"""
     root = settings.atena_root
     fpath = f"{root}/scripts/{filename}"
-
     if isinstance(filedata, str):
         filedata = filedata.encode('utf-8')
     with open(fpath, 'wb') as f:
