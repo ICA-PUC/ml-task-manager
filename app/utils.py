@@ -4,13 +4,15 @@ import json
 from .config import settings
 import datetime
 import random
+import os
 
-
-def save_file(filename: str, filedata: bin) -> str:
+def save_file(filename: str, filedata: bin, task_id: str) -> str:
     """Save file to disk"""
     root = settings.atena_root
-    fpath = f"{root}/scripts/{filename}"
-
+    
+    fpath = f"{root}/scripts/{str(task_id)}"
+    os.makedirs(fpath, exist_ok=True)
+    fpath = f"{root}/scripts/{str(task_id)}/{filename}"
     if isinstance(filedata, str):
         filedata = filedata.encode('utf-8')
     with open(fpath, 'wb') as f:
