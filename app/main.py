@@ -66,12 +66,15 @@ def atena_upload(fname, remote):
     return file_path
 
 
-def create_atena_task(pyname, task):
+def create_atena_task(py_name, task):
     """Create and submit a new task to atena"""
     remote = atena_connect()
-    atena_upload(pyname, remote)
+    atena_upload(py_name, remote, task['id'])
+    print(f"Esse é o meu py_name: {py_name}")
+    print(f"Esse é o que já tenho: {strip_filename(task['script_path'])}")
+    # atena_upload(strip_filename(task['script_path']), remote, task['id'])
     srm_name = prep_template(task)
-    srm_path = atena_upload(srm_name, remote)
+    srm_path = atena_upload(srm_name, remote, task['id'])
     remote.exec(f"sbatch {srm_path}")
     output = remote.get_output()
     remote.close()
@@ -87,23 +90,24 @@ def create_dev_task(pyname, task):
 async def create_task(files: list[UploadFile]):
     """Create new task and save it to DB"""
     # TODO: Split this frankenstein into functions
-
+    task_id = create_task_id()
     for file in files:
         fname = file.filename
         fdata = await file.read()
-        fpath = save_file(fname, fdata)
+        fpath = save_file(fname, fdata, task_id)
         if ".json" in fname:
             conf_path = fpath
         if ".py" in fname:
+            py_path = fpath
             py_name = fname
     task = process_config(conf_path)
+    task['id'] = task_id
     script_name = strip_filename(task['script_path'])
     if script_name != py_name:
         return {
             "msg": f"{script_name} and {py_name} must have same name",
             "status": status.HTTP_400_BAD_REQUEST
         }
-    task['id'] = create_task_id()
     if "atena" in task['runner_location']:
         output = create_atena_task(py_name, task)
     elif "dev" in task['runner_location']:
