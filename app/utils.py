@@ -65,7 +65,9 @@ def get_status_message(code: str) -> str:
         "R": "RUNNING: The job is allocated to a node and running.",
         "S": "SUSPENDED: Running job has been stopped with its cores \
             released to other jobs.",
-        "ST": "STOPPED: Running job has been stopped with its cores retained."
+        "ST": "STOPPED: Running job has been stopped with its cores retained.",
+        "CA": "CANCELLED: Job was explicitly cancelled by the user or system \
+            administrator."
     }
     if code not in squeue_status:
         return "UNKNOWN: The returned job code is not in the list!"
