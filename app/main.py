@@ -1,6 +1,4 @@
 """Entrypoint for the Task Manager API Server"""
-import os
-import shutil
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, UploadFile, status
 from sqlmodel import Session, SQLModel, create_engine, select
@@ -25,13 +23,8 @@ def create_db_and_tables():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan function for initialization and shutting down functions"""
-    # db.init_db()
     create_db_and_tables()
-    os.makedirs('app/tmp', exist_ok=True)
-
     yield
-    # TODO: FIX: this is not running when using `scancel`
-    shutil.rmtree('app/tmp')
 
 app = FastAPI(lifespan=lifespan)
 
@@ -137,14 +130,9 @@ async def get_tasks():
 async def get_job_status(job_id: int):
     """Retrieve job status given ID"""
     remote = atena_connect()
-    # TODO: Adjust squeue params to prevent using try-except for ended job
-    # check squeue --help for options
-    remote.exec(f"squeue -j {job_id}")
+    remote.exec(f"squeue -j {job_id} -h --states=all")
     output = remote.get_output()[0]
-    try:
-        job_status = output.splitlines()[1].split()[4]
-    except IndexError:
-        return output
+    job_status = output.split()[4]
     return get_status_message(job_status)
 
 
