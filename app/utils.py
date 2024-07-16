@@ -89,11 +89,11 @@ def strip_filename(file_path: str) -> str:
     return file_path.split('/')[-1]
 
 
-def create_task_id() -> int:
+def create_task_id() -> str:
     """Create task ID
 
     Create the ID based on the time that the task is created
 
     """
-    task_id = int(datetime.datetime.now().strftime('%Y%m%d%H%M%S%f') + f"{random.randint(0, 9999):04d}")
+    task_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f') + f"{random.randint(0, 9999):04d}"
     return task_id
