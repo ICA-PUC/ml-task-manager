@@ -3,9 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, UploadFile, status
 from sqlmodel import Session, SQLModel, create_engine, select
 from .models.task import Task
-from .utils import save_file, process_config, get_status_message
-from .utils import strip_filename
-from .utils import create_task_id
+from .utils import save_file, process_config, get_status_message, strip_filename, create_task_id
 from .controllers.ssh.handler import RemoteHandler
 from .controllers.slurm.slurm_manager import prep_template
 from .config import settings
