@@ -47,23 +47,20 @@ def dev_connect():
     return remote
 
 
-def atena_upload(fname, remote):
+def atena_upload(fname, remote, task_id: str):
     """Submit job to atena cluster"""
     root = settings.atena_root
-    file_path = f"{root}/scripts/{fname}"
-    sanity_check = remote.send_file(fname, file_path)
+    file_path = f"{root}/scripts/{task_id}/{fname}"
+    sanity_check = remote.send_file(fname, file_path, task_id)
     if not sanity_check:
         return status.HTTP_500_INTERNAL_SERVER_ERROR
     return file_path
 
 
-def create_atena_task(py_name, task):
+def create_atena_task(task):
     """Create and submit a new task to atena"""
     remote = atena_connect()
-    atena_upload(py_name, remote, task['id'])
-    print(f"Esse é o meu py_name: {py_name}")
-    print(f"Esse é o que já tenho: {strip_filename(task['script_path'])}")
-    # atena_upload(strip_filename(task['script_path']), remote, task['id'])
+    atena_upload(strip_filename(task['script_path']), remote, task['id'])
     srm_name = prep_template(task)
     srm_path = atena_upload(srm_name, remote, task['id'])
     remote.exec(f"sbatch {srm_path}")
@@ -100,9 +97,9 @@ async def create_task(files: list[UploadFile]):
             "status": status.HTTP_400_BAD_REQUEST
         }
     if "atena" in task['runner_location']:
-        output = create_atena_task(py_name, task)
+        output = create_atena_task(task)
     elif "dev" in task['runner_location']:
-        output = create_dev_task(py_name, task)
+        output = create_dev_task(task)
     if output[0]:
         job_id = output[0].split('Submitted batch job ')[1][:-1]
     elif output[1]:
