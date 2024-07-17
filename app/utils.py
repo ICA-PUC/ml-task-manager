@@ -2,13 +2,17 @@
 import hashlib
 import json
 from .config import settings
+import datetime
+import random
+import os
 
-
-def save_file(filename: str, filedata: bin) -> str:
+def save_file(filename: str, filedata: bin, task_id: str) -> str:
     """Save file to disk"""
     root = settings.atena_root
-    fpath = f"{root}/scripts/{filename}"
-
+    
+    fpath = f"{root}/scripts/{str(task_id)}"
+    os.makedirs(fpath, exist_ok=True)
+    fpath = f"{root}/scripts/{str(task_id)}/{filename}"
     if isinstance(filedata, str):
         filedata = filedata.encode('utf-8')
     with open(fpath, 'wb') as f:
@@ -83,3 +87,13 @@ def strip_filename(file_path: str) -> str:
     :rtype: str
     """
     return file_path.split('/')[-1]
+
+
+def create_task_id() -> str:
+    """Create task ID
+
+    Create the ID based on the time that the task is created
+
+    """
+    task_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f') + f"{random.randint(0, 9999):04d}"
+    return task_id
