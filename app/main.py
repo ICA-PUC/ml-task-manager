@@ -1,31 +1,16 @@
 """Entrypoint for the Task Manager API Server"""
-from contextlib import asynccontextmanager
 from fastapi import FastAPI, UploadFile, status
-from sqlmodel import Session, SQLModel, create_engine, select
 from .models.task import Task
 from .utils import save_file, process_config, get_status_message
 from .utils import strip_filename
 from .controllers.ssh.handler import RemoteHandler
 from .controllers.slurm.slurm_manager import prep_template
 from .config import settings
-
-SQLITE_FILE_NAME = "database.db"
-sqlite_url = f"sqlite:///{SQLITE_FILE_NAME}"
-engine = create_engine(sqlite_url, echo=True)
+from .db_manager import DBManager
 
 
-def create_db_and_tables():
-    """initialize db and tables"""
-    SQLModel.metadata.create_all(engine)
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Lifespan function for initialization and shutting down functions"""
-    create_db_and_tables()
-    yield
-
-app = FastAPI(lifespan=lifespan)
+dbm = DBManager()
+app = FastAPI()
 
 
 def atena_connect():
@@ -104,31 +89,45 @@ async def create_task(files: list[UploadFile]):
     elif output[1]:
         return {"msg": output[1]}
     task['job_id'] = job_id
-    with Session(engine) as session:
-        db_task = Task.model_validate(task)
-        session.add(db_task)
-        session.commit()
-        session.refresh(db_task)
-        return db_task
+    dbm.insert_task(task)
+    return dbm.get_task_by_id(task['id'])
+
+
+@app.post("/dummy_insert_task/")
+async def insert_dummy_task():
+    """Testing task insertion"""
+    dummy_task = {
+        "id": "unique_id_2",
+        "instance_type": "GPU",
+        "image_name": "sklearn_image.sif",
+        "account": "twinscie",
+        "runner_location": "atena02",
+        "script_path": "path/to/my/script.py",
+        "dataset_name": "titanic.csv",
+        "experiment_name": "task_insertion",
+        "job_id": 42,
+    }
+    dbm.insert_task(dummy_task)
+    return dbm.get_task_by_id(dummy_task['id'])
 
 
 @app.get("/tasks/", response_model=list[Task])
 async def get_tasks():
     """Retrieve all saved tasks"""
-    with Session(engine) as session:
-        tasks = session.exec(select(Task)).all()
-        return tasks
+    return dbm.get_tasks()
+
+
+@app.get("/task/{task_id}")
+async def get_task_by_id(task_id: str):
+    """Retreive a single task given task ID"""
+    return dbm.get_task_by_id(task_id)
 
 
 @app.get("/job_status/{job_id}")
 async def get_job_status(job_id: int):
-    """Retrieve job status given ID"""
+    """Retrieve job status given job ID"""
     remote = atena_connect()
     remote.exec(f"squeue -j {job_id} -h --states=all")
     output = remote.get_output()[0]
     job_status = output.split()[4]
     return get_status_message(job_status)
-
-
-if __name__ == "__main__":
-    create_db_and_tables()

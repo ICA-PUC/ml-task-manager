@@ -26,7 +26,7 @@ class Task(TaskBase, table=True):
     :param table: SQLModel param to declare as a table, defaults to True
     :type table: bool, optional
     """
-    id: int | None = Field(default=None, primary_key=True)
+    id: str | None = Field(default=None, primary_key=True)
 
 
 class TaskCreate(TaskBase):
@@ -43,4 +43,4 @@ class TaskRead(TaskBase):
     :param TaskBase: The base model class
     :type TaskBase: SQLModel
     """
-    id: int
+    id: str
