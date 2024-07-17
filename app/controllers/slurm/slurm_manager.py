@@ -24,5 +24,5 @@ def prep_template(job_params):
         dataset_name=job_params['dataset_name'],
     )
     fname = 'slurm_script.srm'
-    save_file(fname, slurm_script)
+    save_file(fname, slurm_script, job_params['id'])
     return fname
