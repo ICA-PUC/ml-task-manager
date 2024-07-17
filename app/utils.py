@@ -5,6 +5,11 @@ from .config import settings
 import datetime
 import random
 import os
+#################
+# temp auxiliar #
+#################
+from fastapi import status
+from .controllers.ssh.handler import RemoteHandler
 
 def save_file(filename: str, filedata: bin, task_id: str) -> str:
     """Save file to disk"""
@@ -97,3 +102,23 @@ def create_task_id() -> str:
     """
     task_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f') + f"{random.randint(0, 9999):04d}"
     return task_id
+
+#### Temporary functions that will be replaced into class
+
+def atena_upload(fname, remote, task_id):
+    """Submit job to atena cluster"""
+    root = settings.atena_root
+    file_path = f"{root}/scripts/{task_id}/{fname}"
+    sanity_check = remote.send_file(fname, file_path, task_id)
+    if not sanity_check:
+        return status.HTTP_500_INTERNAL_SERVER_ERROR
+    return file_path
+
+def atena_connect():
+    """Spawn new remote handler with atena config"""
+    remote = RemoteHandler()
+    host = "atn1mg4"
+    user = settings.env_confs['ATENA_USER']
+    passwd = settings.env_confs['ATENA_PASSWD']
+    remote.connect(host, user, passwd)
+    return remote
