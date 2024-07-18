@@ -12,11 +12,22 @@ class DBManager:
         envs = settings.env_confs
         username = envs['DB_USER']
         password = envs['DB_PASSWORD']
-        cp = oracledb.ConnectParams()
-        cp.parse_connect_string(envs['DB_STRING'])
-        self.engine = create_engine(
-            f'oracle+oracledb://{username}:{password}@{cp.host}:{cp.port} \
-                /?service_name={cp.service_name}')
+        host = envs['DB_HOST']
+        if envs['DB_NAME'] == "ORACLE":
+            port = envs['ORACLE_DB_PORT']
+            service_name = envs['ORACLE_DB_SERVICE']
+            # cp = oracledb.ConnectParams()
+            # cp.parse_connect_string(envs['DB_STRING'])
+            self.engine = create_engine(
+                f'oracle+oracledb://{username}:{password}@{host}:{port} \
+                    /?service_name={service_name}')
+        else:
+            port = envs['PSQL_DB_PORT']
+            service_name = envs['PSQL_DB_SERVICE']
+            self.engine = create_engine(
+                f'postgresql://{username}:{password}@{host}:{port} \
+                    /{service_name}'
+            )
 
     def insert_task(self, task):
         """Insert new task into database"""

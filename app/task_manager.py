@@ -48,7 +48,7 @@ class TaskManager():
         return datetime.datetime.now().strftime('%Y%m%d%H%M%S%f') + f"{random.randint(0, 9999):04d}"
 
     def _config_task_dict(self):
-        self.task_dict = self._process_config(self.conf_path)
+        self.task_dict = self._process_config()
         self.task_dict['id'] = self.task_id
 
     def _is_file_name_equal(self):

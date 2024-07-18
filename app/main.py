@@ -24,7 +24,6 @@ def dev_connect():
 @app.post("/new_task/")
 async def create_task(files: list[UploadFile]):
     """Create new task and save it to DB"""
-    # TODO: Split this frankenstein into functions
     task_id = create_task_id()
     for file in files:
         fname = file.filename
