@@ -1,5 +1,4 @@
 """Database Manager module"""
-import oracledb
 from sqlmodel import create_engine, Session, select
 from .config import settings
 from .models.task import Task
