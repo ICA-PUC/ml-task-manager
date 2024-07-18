@@ -1,0 +1,28 @@
+#!/bin/bash
+#SBATCH --nodes=1               #Numero de Nós
+#SBATCH --ntasks-per-node=1     #Numero de tarefas por Nó
+#SBATCH --ntasks=1              #Numero de tarefas
+#SBATCH -p cpu                  #Fila (partition) a ser utilizada
+#SBATCH -J dtwin-oracle-db        #Nome job
+#SBATCH --account=twinscie
+#SBATCH --exclusive
+#SBATCH --exclude atn1b01n16,atn1b01n08,atn1b03n25,atn1b01n19
+#SBATCH -o db_log.txt
+
+echo "CUDA_VISIBLE_DEVICES: " $CUDA_VISIBLE_DEVICES
+echo "JOB NODELIST": $SLURM_JOB_NODELIST
+echo "JOB ID: " $SLURM_JOBID
+echo "JOB NAME: " $SLURM_JOB_NAME
+
+export ATENA_ROOT=/nethome/projetos30/arcabouco_ml
+export ROOT_DB=$ATENA_ROOT/oracle-db
+export SIF_PATH=$ATENA_ROOT/singularities
+
+
+singularity run -B $ROOT_DB/oradata:/opt/oracle/oradata -B $ROOT_DB/sql:/opt/oracle/scripts/setup -e -C --env-file $ROOT_DB/db.env --writable $SIF_PATH/oracle-db.sif
+
+#singularity run -e -C --env-file $ROOT_DB/db.env --overlay $SIF_PATH/overlay.img $SIF_PATH/oracle-db.sif
+
+#singularity run -e -C --env-file $ROOT_DB/db.env --writable $SIF_PATH/oracle-db.sif
+
+echo "db_run.srm finished."

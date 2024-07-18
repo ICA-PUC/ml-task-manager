@@ -1,0 +1,28 @@
+#!/bin/bash
+#SBATCH --nodes=1               #Numero de Nós
+#SBATCH --ntasks-per-node=1     #Numero de tarefas por Nó
+#SBATCH --ntasks=1              #Numero de tarefas
+#SBATCH -p cpu                  #Fila (partition) a ser utilizada
+#SBATCH -J dtwin-psql-db        #Nome job
+#SBATCH --account=twinscie
+#SBATCH --exclusive
+#SBATCH --exclude atn1b01n16,atn1b01n08,atn1b03n25,atn1b01n19
+#SBATCH -o psql_log.txt
+
+echo "CUDA_VISIBLE_DEVICES: " $CUDA_VISIBLE_DEVICES
+echo "JOB NODELIST": $SLURM_JOB_NODELIST
+echo "JOB ID: " $SLURM_JOBID
+echo "JOB NAME: " $SLURM_JOB_NAME
+
+export ATENA_ROOT=/nethome/projetos30/arcabouco_ml
+export ROOT_DB=$ATENA_ROOT/psql-db
+export SIF_PATH=/nethome/projetos30/arcabouco_ml/singularities
+
+export POSTGRES_USER=SYSTEM
+export POSTGRES_PASS=Digital_twin_db42
+export POSTGRES_DB=ml-task-manager
+export POSTGRES_ADDR=0.0.0.0:4432
+
+SINGULARITYENV_POSTGRES_PASSWORD=$POSTGRES_PASS singularity run -B $ROOT_DB:/var $SIF_PATH/psql.sif
+
+echo "db_run.srm finished."
