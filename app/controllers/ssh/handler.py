@@ -54,10 +54,11 @@ class RemoteHandler:
         """Send file via scp"""
         scp = SCPClient(self.client.get_transport())
         root = settings.atena_root
-        remote_path = f"{root}/uploads/{str(task_id)}"#/{filename}"
+        folder_destination = 'uploads'
+        remote_path = f"{root}/{folder_destination}/{str(task_id)}"
         self.exec(f'mkdir {remote_path}')
-        remote_complete_name = remote_path + f'/{filename}'
-        scp.put(local_path, remote_complete_name)
+        remote_file_path = remote_path + f'/{filename}'
+        scp.put(local_path, remote_file_path)
         scp.close()
-        sanity_check = self._assert_integrity(local_path, remote_complete_name)
+        sanity_check = self._assert_integrity(local_path, remote_file_path)
         return sanity_check
