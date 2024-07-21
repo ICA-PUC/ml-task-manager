@@ -14,8 +14,8 @@ from .controllers.ssh.handler import RemoteHandler
 def save_file(filename: str, filedata: bin, task_id: str) -> str:
     """Save file to disk"""
     root = settings.atena_root
-    
-    fpath = f"{root}/scripts/{str(task_id)}"
+    folder_destination = 'scripts'
+    fpath = f"{root}/{folder_destination}/{str(task_id)}"
     os.makedirs(fpath, exist_ok=True)
     fpath = f"{root}/scripts/{str(task_id)}/{filename}"
     if isinstance(filedata, str):
@@ -108,7 +108,8 @@ def create_task_id() -> str:
 def atena_upload(fname, remote, task_id):
     """Submit job to atena cluster"""
     root = settings.atena_root
-    file_path = f"{root}/scripts/{task_id}/{fname}"
+    folder_destination = 'scripts'
+    file_path = f"{root}/{folder_destination}/{task_id}/{fname}"
     sanity_check = remote.send_file(fname, file_path, task_id)
     if not sanity_check:
         return status.HTTP_500_INTERNAL_SERVER_ERROR

@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, UploadFile, status
 from sqlmodel import Session, SQLModel, create_engine, select
 from .models.task import Task
-from .utils import save_file, get_status_message, create_task_id
+from . import utils
 from .controllers.ssh.handler import RemoteHandler
 from .config import settings
 from .task_manager import TaskManager
@@ -39,19 +39,20 @@ def dev_connect():
 async def create_task(files: list[UploadFile]):
     """Create new task and save it to DB"""
     # TODO: Split this frankenstein into functions
-    task_id = create_task_id()
+    task_id = utils.create_task_id()
     for file in files:
         fname = file.filename
         fdata = await file.read()
-        fpath = save_file(fname, fdata, task_id)
+        fpath = utils.save_file(fname, fdata, task_id)
         if ".json" in fname:
             conf_path = fpath
         if ".py" in fname:
             py_name = fname
     task_manager = TaskManager(task_id, py_name, conf_path, engine)
-    output = task_manager.run_task()
+    task_dict = task_manager.run_task()
+    #todo if the task_manager.run_task have problems the return is a dict with a msg, we need to handle this erro
     with Session(engine) as session:
-        db_task = Task.model_validate(output)
+        db_task = Task.model_validate(task_dict)
         session.add(db_task)
         session.commit()
         session.refresh(db_task)
@@ -73,7 +74,7 @@ async def get_job_status(job_id: int):
     remote.exec(f"squeue -j {job_id} -h --states=all")
     output = remote.get_output()[0]
     job_status = output.split()[4]
-    return get_status_message(job_status)
+    return utils.get_status_message(job_status)
 
 
 if __name__ == "__main__":
