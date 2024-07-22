@@ -29,7 +29,7 @@ class TaskManager():
         """Process configuration file"""
         configuration = self._load_json(self.conf_path)
         filtered_configuration = {}
-        cluster_conf = {
+        cluster_configuration = {
             'atena02': ['instance_type', 'image_name', 'account'],
             'dev': ['instance_type', 'image_name', 'account']
         }
@@ -40,10 +40,9 @@ class TaskManager():
         for parameters in general_configuration:
             filtered_configuration[parameters] = configuration[parameters]
 
-        for parameters in cluster_conf[target_cluster]:
-            cluster_conf = configuration['clusters'][target_cluster]
-            infra_params = ['infra_config'][parameters]
-            filtered_configuration[parameters] = infra_params
+        for parameters in cluster_configuration[target_cluster]:
+            cluster_parameters = configuration['clusters'][target_cluster]['infra_config'][parameters]
+            filtered_configuration[parameters] = cluster_parameters
         return filtered_configuration
 
     def _create_task_id(self):
