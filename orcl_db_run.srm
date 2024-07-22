@@ -7,7 +7,7 @@
 #SBATCH --account=twinscie
 #SBATCH --exclusive
 #SBATCH --exclude atn1b01n16,atn1b01n08,atn1b03n25,atn1b01n19
-#SBATCH -o db_log.txt
+#SBATCH -o orcl_db_log.txt
 
 echo "CUDA_VISIBLE_DEVICES: " $CUDA_VISIBLE_DEVICES
 echo "JOB NODELIST": $SLURM_JOB_NODELIST

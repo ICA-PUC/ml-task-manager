@@ -18,11 +18,6 @@ export ATENA_ROOT=/nethome/projetos30/arcabouco_ml
 export ROOT_DB=$ATENA_ROOT/psql-db
 export SIF_PATH=/nethome/projetos30/arcabouco_ml/singularities
 
-export POSTGRES_USER=SYSTEM
-export POSTGRES_PASS=Digital_twin_db42
-export POSTGRES_DB=ml-task-manager
-export POSTGRES_ADDR=0.0.0.0:4432
-
-SINGULARITYENV_POSTGRES_PASSWORD=$POSTGRES_PASS singularity run -B $ROOT_DB:/var $SIF_PATH/psql.sif
+singularity run -B $ROOT_DB/pgdata:/var/lib/postgresql/data -B $ROOT_DB/pgrun:/var/run/postgresql -e -C --env-file $ROOT_DB/pg.env $SIF_PATH/psql.sif
 
 echo "db_run.srm finished."

@@ -3,11 +3,11 @@
 #SBATCH --ntasks-per-node=1     #Numero de tarefas por Nó
 #SBATCH --ntasks=1              #Numero de tarefas
 #SBATCH -p cpu                  #Fila (partition) a ser utilizada
-#SBATCH -J dtwin-psql-db        #Nome job
+#SBATCH -J dtwin-api            #Nome job
 #SBATCH --account=twinscie
 #SBATCH --exclusive
 #SBATCH --exclude atn1b01n16,atn1b01n08,atn1b03n25,atn1b01n19
-#SBATCH -o db_log.txt
+#SBATCH -o api_log.txt
 
 echo "CUDA_VISIBLE_DEVICES: " $CUDA_VISIBLE_DEVICES
 echo "JOB NODELIST": $SLURM_JOB_NODELIST
@@ -15,10 +15,9 @@ echo "JOB ID: " $SLURM_JOBID
 echo "JOB NAME: " $SLURM_JOB_NAME
 
 export ATENA_ROOT=/nethome/projetos30/arcabouco_ml
-export ROOT_DB=$ATENA_ROOT/oracle-db
-export SIF_PATH=$ATENA_ROOT/singularities
+export ROOT_API=$ATENA_ROOT/lucas/ml-task-manager
+export SIF_PATH=/nethome/projetos30/arcabouco_ml/singularities/
 
+singularity run -B $ATENA_ROOT:$ATENA_ROOT $SIF_PATH/api.sif sh $ROOT_API/run_api.sh --port 8008 --host 0.0.0.0
 
-singularity run -B $ROOT_DB/oradata:/opt/oracle/oradata -B $ROOT_DB/sql:/opt/oracle/scripts/setup -e -C --env-file $ROOT_DB/db.env $SIF_PATH/oracle-db.sif
-
-echo "db_run.srm finished."
+echo "run_api.srm finished."
