@@ -1,6 +1,7 @@
 database.db
 *.sif
 my.env
+oradata/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
