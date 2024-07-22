@@ -1,7 +1,7 @@
 """Entrypoint for the Task Manager API Server"""
 from fastapi import FastAPI, UploadFile
 from .models.task import Task
-from .utils import save_file, get_status_message, create_task_id, atena_connect
+from . import utils
 from .controllers.ssh.handler import RemoteHandler
 from .db_manager import DBManager
 from .task_manager import TaskManager
@@ -24,11 +24,11 @@ def dev_connect():
 @app.post("/new_task/")
 async def create_task(files: list[UploadFile]):
     """Create new task and save it to DB"""
-    task_id = create_task_id()
+    task_id = utils.create_task_id()
     for file in files:
         fname = file.filename
         fdata = await file.read()
-        fpath = save_file(fname, fdata, task_id)
+        fpath = utils.save_file(fname, fdata, task_id)
         if ".json" in fname:
             conf_path = fpath
         if ".py" in fname:
@@ -76,4 +76,4 @@ async def get_job_status(job_id: int):
     remote.exec(f"squeue -j {job_id} -h --states=all")
     output = remote.get_output()[0]
     job_status = output.split()[4]
-    return get_status_message(job_status)
+    return utils.get_status_message(job_status)
