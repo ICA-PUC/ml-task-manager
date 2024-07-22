@@ -39,24 +39,6 @@ async def create_task(files: list[UploadFile]):
     return dbm.get_task_by_id(output['id'])
 
 
-@app.post("/dummy_insert_task/")
-async def insert_dummy_task():
-    """Testing task insertion"""
-    dummy_task = {
-        "id": "unique_id_2",
-        "instance_type": "GPU",
-        "image_name": "sklearn_image.sif",
-        "account": "twinscie",
-        "runner_location": "atena02",
-        "script_path": "path/to/my/script.py",
-        "dataset_name": "titanic.csv",
-        "experiment_name": "task_insertion",
-        "job_id": 42,
-    }
-    dbm.insert_task(dummy_task)
-    return dbm.get_task_by_id(dummy_task['id'])
-
-
 @app.get("/tasks/", response_model=list[Task])
 async def get_tasks():
     """Retrieve all saved tasks"""
@@ -72,7 +54,7 @@ async def get_task_by_id(task_id: str):
 @app.get("/job_status/{job_id}")
 async def get_job_status(job_id: int):
     """Retrieve job status given job ID"""
-    remote = atena_connect()
+    remote = utils.atena_connect()
     remote.exec(f"squeue -j {job_id} -h --states=all")
     output = remote.get_output()[0]
     job_status = output.split()[4]

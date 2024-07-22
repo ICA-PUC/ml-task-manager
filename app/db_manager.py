@@ -15,8 +15,6 @@ class DBManager:
         if envs['DB_NAME'] == "ORACLE":
             port = envs['ORACLE_DB_PORT']
             service_name = envs['ORACLE_DB_SERVICE']
-            # cp = oracledb.ConnectParams()
-            # cp.parse_connect_string(envs['DB_STRING'])
             self.engine = create_engine(
                 f'oracle+oracledb://{username}:{password}@{host}:{port} \
                     /?service_name={service_name}')
@@ -50,3 +48,22 @@ class DBManager:
             statement = select(Task).where(Task.id == task_id)
             results = session.exec(statement).all()
             return results
+
+
+def insert_dummy_task():
+    """Testing task insertion"""
+
+    dbm = DBManager()
+    dummy_task = {
+        "id": "unique_id_2",
+        "instance_type": "GPU",
+        "image_name": "sklearn_image.sif",
+        "account": "twinscie",
+        "runner_location": "atena02",
+        "script_path": "path/to/my/script.py",
+        "dataset_name": "titanic.csv",
+        "experiment_name": "task_insertion",
+        "job_id": 42,
+    }
+    dbm.insert_task(dummy_task)
+    return dbm.get_task_by_id(dummy_task['id'])
