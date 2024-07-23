@@ -1,4 +1,4 @@
-create table TASK
+create table twincore_task
         (ID nvarchar2(100) not null,
          INSTANCE_TYPE nvarchar2(100) not null,
          IMAGE_NAME nvarchar2(100) not null,
@@ -7,6 +7,5 @@ create table TASK
          SCRIPT_PATH nvarchar2(200) not null,
          DATASET_NAME nvarchar2(100) not null,
          EXPERIMENT_NAME nvarchar2(100) not null,
-         JOB_ID number(10) not null
-        )
+         JOB_ID number(10) not null)
 /

@@ -1,7 +1,8 @@
 """Oracle database connection variables"""
-import os
+from dotenv import dotenv_values
 
-user = os.environ.get("PYTHON_SYSUSER", "C5KI")
-pw = os.environ.get("PYTHON_SYSPASSWORD", "nNe#1Eqaiv")
-dsn = os.environ.get("PYTHON_CONNECT_STRING",
-                     "bdc5kit.petrobras.com.br:1521/c5kit.petrobras.com.br")
+config = dotenv_values("../.env")
+
+user = config['DB_USER']
+pw = config['DB_PASSWORD']
+dsn = config['DB_DSN']

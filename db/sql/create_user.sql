@@ -1,4 +1,4 @@
-create user API
+create user &user
 /
 
 grant
@@ -9,7 +9,7 @@ grant
     create sequence,
     select any dictionary,
     unlimited tablespace
-to API
+to &user
 /
 
 begin
@@ -19,13 +19,11 @@ begin
               from dba_roles
               where role in ('SODA_APP', 'AQ_ADMINISTRATOR_ROLE')
             ) loop
-        execute immediate 'grant ' || r.role || ' to API';
+        execute immediate 'grant ' || r.role || ' to &user';
     end loop;
 
 end;
 /
 
-alter user API identified by "API123"
+alter user &user identified by "&pw"
 /
-
-exit;
