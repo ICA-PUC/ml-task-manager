@@ -9,8 +9,11 @@ con = oracledb.connect(
 )
 
 # create twincore_task table
-run_sql_script.run_sql_script(
-    con, "create_table", user=db_config.user, pw=db_config.pw,
-    dsn=db_config.dsn
-)
+#run_sql_script.run_sql_script(
+#    con, "create_table", user=db_config.user, pw=db_config.pw,
+#    dsn=db_config.dsn
+#)
+
+run_sql_script.run_sql_script(con, "create_table")
+
 print("Done.")
