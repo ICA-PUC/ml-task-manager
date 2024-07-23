@@ -1,7 +1,6 @@
 """Utility functions module"""
 import hashlib
 import json
-from .config import settings
 import datetime
 import random
 import os
@@ -10,6 +9,9 @@ import os
 #################
 from fastapi import status
 from .controllers.ssh.handler import RemoteHandler
+#################
+from .config import settings
+
 
 def save_file(filename: str, filedata: bin, task_id: str) -> str:
     """Save file to disk"""
@@ -100,10 +102,12 @@ def create_task_id() -> str:
     Create the ID based on the time that the task is created
 
     """
-    task_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f') + f"{random.randint(0, 9999):04d}"
+    task_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f') + \
+        f"{random.randint(0, 9999):04d}"
     return task_id
 
-#### Temporary functions that will be replaced into class
+# Temporary functions that will be replaced into class
+
 
 def atena_upload(fname, remote, task_id):
     """Submit job to atena cluster"""
@@ -114,6 +118,7 @@ def atena_upload(fname, remote, task_id):
     if not sanity_check:
         return status.HTTP_500_INTERNAL_SERVER_ERROR
     return file_path
+
 
 def atena_connect():
     """Spawn new remote handler with atena config"""

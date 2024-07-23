@@ -1,16 +1,14 @@
 {
     "dataset_name": "BostonHousing",
-
     "model_params": {
       "n_estimators": 2,
       "random_state": 42
     },
-
-    "runner_location": "dev",
+    "runner_location": "atena02",
     "model_tracking": true,
     "tracking_uri": "experiments",
     "experiment_name": "atena_test",
-    "script_path": "./script.py",
+    "script_path": "./test.py",
     "clusters": {
       "dev": {
         "infra_config": {
@@ -26,7 +24,6 @@
           "account": "twinscie"
         }
       },
-      
       "aws": {
         "infra_config": {
           "role": "arn:aws:iam::example",

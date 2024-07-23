@@ -5,11 +5,5 @@ docker pull postgres:15-alpine
 cd app/docker
 docker build -t humblebeaver/ml-task-manager .
 
-cd ../manager
-docker build -t managerslurm .
-
-cd ../server/master
-docker build -t masterslurm .
-
-cd ../node
-docker build -t nodeslurm .
+cd ../../db/docker
+bash ./buildDockerImage.sh -v 19.3.0 -e

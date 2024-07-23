@@ -1,30 +1,15 @@
 """Entrypoint for the Task Manager API Server"""
-from contextlib import asynccontextmanager
-from fastapi import FastAPI, UploadFile, status
-from sqlmodel import Session, SQLModel, create_engine, select
+from fastapi import FastAPI, UploadFile
 from .models.task import Task
 from . import utils
 from .controllers.ssh.handler import RemoteHandler
-from .config import settings
+from .db_manager import DBManager
 from .task_manager import TaskManager
 
-SQLITE_FILE_NAME = "database.db"
-sqlite_url = f"sqlite:///{SQLITE_FILE_NAME}"
-engine = create_engine(sqlite_url, echo=True)
 
+dbm = DBManager()
+app = FastAPI()
 
-def create_db_and_tables():
-    """initialize db and tables"""
-    SQLModel.metadata.create_all(engine)
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Lifespan function for initialization and shutting down functions"""
-    create_db_and_tables()
-    yield
-
-app = FastAPI(lifespan=lifespan)
 
 def dev_connect():
     """Spawn new remote handler with dev config"""
@@ -35,10 +20,10 @@ def dev_connect():
     remote.connect(host, user, passwd)
     return remote
 
+
 @app.post("/new_task/")
 async def create_task(files: list[UploadFile]):
     """Create new task and save it to DB"""
-    # TODO: Split this frankenstein into functions
     task_id = utils.create_task_id()
     for file in files:
         fname = file.filename
@@ -48,34 +33,29 @@ async def create_task(files: list[UploadFile]):
             conf_path = fpath
         if ".py" in fname:
             py_name = fname
-    task_manager = TaskManager(task_id, py_name, conf_path, engine)
-    task_dict = task_manager.run_task()
-    #todo if the task_manager.run_task have problems the return is a dict with a msg, we need to handle this erro
-    with Session(engine) as session:
-        db_task = Task.model_validate(task_dict)
-        session.add(db_task)
-        session.commit()
-        session.refresh(db_task)
-        return db_task
+    task_manager = TaskManager(task_id, py_name, conf_path)
+    output = task_manager.run_task()
+    dbm.insert_task(output)
+    return dbm.get_task_by_id(output['id'])
 
 
 @app.get("/tasks/", response_model=list[Task])
 async def get_tasks():
     """Retrieve all saved tasks"""
-    with Session(engine) as session:
-        tasks = session.exec(select(Task)).all()
-        return tasks
+    return dbm.get_tasks()
+
+
+@app.get("/task/{task_id}")
+async def get_task_by_id(task_id: str):
+    """Retreive a single task given task ID"""
+    return dbm.get_task_by_id(task_id)
 
 
 @app.get("/job_status/{job_id}")
 async def get_job_status(job_id: int):
-    """Retrieve job status given ID"""
-    remote = atena_connect()
+    """Retrieve job status given job ID"""
+    remote = utils.atena_connect()
     remote.exec(f"squeue -j {job_id} -h --states=all")
     output = remote.get_output()[0]
     job_status = output.split()[4]
     return utils.get_status_message(job_status)
-
-
-if __name__ == "__main__":
-    create_db_and_tables()
