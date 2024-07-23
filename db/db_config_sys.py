@@ -1,7 +1,7 @@
 """Oracle database connection variables"""
 import os
 
-sysuser = os.environ.get("PYTHON_SYSUSER", "SYSTEM")
-syspw = os.environ.get("PYTHON_SYSPASSWORD", "Digital_twin_db42")
+sysuser = os.environ.get("PYTHON_SYSUSER", "C5KI")
+syspw = os.environ.get("PYTHON_SYSPASSWORD", "nNe#1Eqaiv")
 dsn = os.environ.get("PYTHON_CONNECT_STRING",
-                     "localhost/ORCLPDB1")
+                     "bdc5kit.petrobras.com.br:1521/c5kit.petrobras.com.br")
