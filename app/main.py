@@ -1,6 +1,5 @@
 """Entrypoint for the Task Manager API Server"""
 from fastapi import FastAPI, UploadFile
-from .models.task import Task
 from . import utils
 from .controllers.ssh.handler import RemoteHandler
 from .db_manager import DBManager
@@ -39,7 +38,7 @@ async def create_task(files: list[UploadFile]):
     return dbm.get_task_by_id(output['id'])
 
 
-@app.get("/tasks/", response_model=list[Task])
+@app.get("/tasks/")
 async def get_tasks():
     """Retrieve all saved tasks"""
     return dbm.get_tasks()

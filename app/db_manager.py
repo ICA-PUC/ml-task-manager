@@ -1,7 +1,7 @@
 """Database Manager module"""
 from sqlmodel import create_engine, Session, select
 from .config import settings
-from .models.task import Task
+from .models.task import Twincore_task as Task
 
 
 class DBManager:
@@ -67,3 +67,7 @@ def insert_dummy_task():
     }
     dbm.insert_task(dummy_task)
     return dbm.get_task_by_id(dummy_task['id'])
+
+
+if __name__ == "__main__":
+    insert_dummy_task()
