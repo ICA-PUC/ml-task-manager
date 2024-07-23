@@ -1,5 +1,3 @@
-connect SYSTEM/Digital_twin_db42@ORCLPDB1
-
 create table TASK
         (ID nvarchar2(100) not null,
          INSTANCE_TYPE nvarchar2(100) not null,
@@ -12,5 +10,3 @@ create table TASK
          JOB_ID number(10) not null
         )
 /
-
-exit;

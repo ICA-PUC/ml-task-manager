@@ -1,5 +1,3 @@
-connect system/Digital_twin_db42@ORCLPDB1
-
 create user API
 /
 
