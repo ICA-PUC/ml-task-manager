@@ -3,6 +3,7 @@ database.db
 my.env
 *.zip
 oradata/
+template.env
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
