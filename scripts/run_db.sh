@@ -1,5 +1,6 @@
 #!/bin/sh
 
+cd db
 RFOLDER="$(pwd)"
 
 docker run --name dtwin-oracle_db -d \
