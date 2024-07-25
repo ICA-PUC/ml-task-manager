@@ -2,5 +2,8 @@
 
 export DATABASE_URL=ANY
 export ATENA_ROOT=ANY
+export NFS_ROOT=ANY
+export SIF_PATH=ANY
 
-uvicorn app.main:app --host 0.0.0.0 --port 8008
+cd app
+fastapi dev main.py --port 8008

@@ -1,7 +1,8 @@
 """Database Manager module"""
 from sqlmodel import create_engine, Session, select
 from .config import settings
-from .models.task import ffir_twincore_task as Task
+from .models.task import fg1n_twincore_task as Task
+from .models.user import fg1n_twincore_user as User
 
 
 class DBManager:
@@ -12,19 +13,11 @@ class DBManager:
         username = envs['DB_USER']
         password = envs['DB_PASSWORD']
         host = envs['DB_HOST']
-        if envs['DB_NAME'] == "ORACLE":
-            port = envs['ORACLE_DB_PORT']
-            service_name = envs['ORACLE_DB_SERVICE']
-            self.engine = create_engine(
-                f'oracle+oracledb://{username}:{password}@{host}:{port} \
-                    /?service_name={service_name}')
-        else:
-            port = envs['PSQL_DB_PORT']
-            service_name = envs['PSQL_DB_SERVICE']
-            self.engine = create_engine(
-                f'postgresql://{username}:{password}@{host}:{port} \
-                    /{service_name}'
-            )
+        port = envs['ORACLE_DB_PORT']
+        service_name = envs['ORACLE_DB_SERVICE']
+        self.engine = create_engine(
+            f'oracle+oracledb://{username}:{password}@{host}:{port} \
+                /?service_name={service_name}')
 
     def insert_task(self, task):
         """Insert new task into database"""
@@ -34,6 +27,15 @@ class DBManager:
             session.commit()
             session.refresh(db_task)
             return db_task
+
+    def insert_user(self, user):
+        """Insert new user into db"""
+        with Session(self.engine) as session:
+            db_user = User.model_validate(user)
+            session.add(db_user)
+            session.commit()
+            session.refresh(db_user)
+            return db_user
 
     def get_tasks(self):
         """Fetch all tasks from database"""
@@ -49,25 +51,16 @@ class DBManager:
             results = session.exec(statement).all()
             return results
 
+    def get_users(self):
+        """Fetch all users from database"""
+        with Session(self.engine) as session:
+            statement = select(User)
+            results = session.exec(statement).all()
+            return results
 
-def insert_dummy_task():
-    """Testing task insertion"""
-
-    dbm = DBManager()
-    dummy_task = {
-        "id": "unique_id_2",
-        "instance_type": "GPU",
-        "image_name": "sklearn_image.sif",
-        "account": "twinscie",
-        "runner_location": "atena02",
-        "script_path": "path/to/my/script.py",
-        "dataset_name": "titanic.csv",
-        "experiment_name": "task_insertion",
-        "job_id": 42,
-    }
-    dbm.insert_task(dummy_task)
-    return dbm.get_task_by_id(dummy_task['id'])
-
-
-if __name__ == "__main__":
-    insert_dummy_task()
+    def get_user_by_name(self, username):
+        """Retrieve user data"""
+        with Session(self.engine) as session:
+            statement = select(User).where(User.username == username)
+            results = session.exec(statement).all()
+            return results

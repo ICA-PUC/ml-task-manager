@@ -1,4 +1,4 @@
-create table ffir_twincore_task
+create table fg1n_twincore_task
         (ID nvarchar2(100) not null,
          INSTANCE_TYPE nvarchar2(100) not null,
          IMAGE_NAME nvarchar2(100) not null,
