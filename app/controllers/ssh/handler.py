@@ -53,10 +53,11 @@ class RemoteHandler:
     def send_file(self, filename, local_path, task_id: str):
         """Send file via scp"""
         scp = SCPClient(self.client.get_transport())
-        root = settings.atena_root
+        # root = settings.atena_root
+        root = settings.nfs_root
         folder_destination = 'uploads'
         remote_path = f"{root}/{folder_destination}/{str(task_id)}"
-        self.exec(f'mkdir {remote_path}')
+        self.exec(f'mkdir -p {remote_path}')
         remote_file_path = remote_path + f'/{filename}'
         scp.put(local_path, remote_file_path)
         scp.close()

@@ -1,3 +1,4 @@
+from ...config import settings
 """Slurm Job Manager for job instanciation controll"""
 from ...utils import save_file, strip_filename
 
@@ -23,6 +24,9 @@ def prepare_srm_template(task_dict):
         script_name=strip_filename(task_dict['script_path']),
         dataset_name=task_dict['dataset_name'],
         task_id=task_dict['id'],
+        sif_path = settings.sif_root,
+        atena_root = settings.atena_root,
+        nfs_root = settings.nfs_root,
     )
     fname = f'slurm_script_{task_dict["id"]}.srm'
     fpath = save_file(fname, slurm_script,task_dict["id"])

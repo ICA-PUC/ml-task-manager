@@ -1,2 +1,2 @@
-def user = "FG1N"
+def user = "ffir"
 def connect_string = "localhost/ORCLPDB1"
