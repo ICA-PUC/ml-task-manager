@@ -15,7 +15,8 @@ from .config import settings
 
 def save_file(filename: str, filedata: bin, task_id: str) -> str:
     """Save file to disk"""
-    root = settings.atena_root
+    # root = settings.atena_root
+    root = settings.nfs_root
     folder_destination = 'scripts'
     fpath = f"{root}/{folder_destination}/{str(task_id)}"
     os.makedirs(fpath, exist_ok=True)
@@ -111,7 +112,8 @@ def create_task_id() -> str:
 
 def atena_upload(fname, remote, task_id):
     """Submit job to atena cluster"""
-    root = settings.atena_root
+    # root = settings.atena_root
+    root = settings.nfs_root
     folder_destination = 'scripts'
     file_path = f"{root}/{folder_destination}/{task_id}/{fname}"
     sanity_check = remote.send_file(fname, file_path, task_id)

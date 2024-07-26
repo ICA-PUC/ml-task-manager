@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     """
     env_confs: dict = dotenv_values(".env", verbose=True)
     atena_root: str = Field(validation_alias='ATENA_ROOT')
-
+    nfs_root: str = Field(validation_alias='NFS_ROOT')
+    sif_root: str = Field(validation_alias='SIF_PATH')
 
 settings = Settings()

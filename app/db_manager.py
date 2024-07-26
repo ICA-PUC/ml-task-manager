@@ -1,7 +1,7 @@
 """Database Manager module"""
 from sqlmodel import create_engine, Session, select
 from .config import settings
-from .models.task import fg1n_twincore_task as Task
+from .models.task import ffir_twincore_task as Task
 
 
 class DBManager:
