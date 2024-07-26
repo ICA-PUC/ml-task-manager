@@ -1,8 +1,8 @@
 """Database Manager module"""
 from sqlmodel import create_engine, Session, select
-from .config import settings
-from .models.task import fg1n_twincore_task as Task
-from .models.user import fg1n_twincore_user as User
+from app.config import settings
+from app.models.task import fg1n_twincore_task as Task
+from app.models.user import fg1n_twincore_user as User
 
 
 class DBManager:
@@ -62,5 +62,5 @@ class DBManager:
         """Retrieve user data"""
         with Session(self.engine) as session:
             statement = select(User).where(User.username == username)
-            results = session.exec(statement).all()
+            results = session.exec(statement).one()
             return results

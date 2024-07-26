@@ -7,6 +7,6 @@ con = oracledb.connect(
     user=db_config.user, password=db_config.pw, dsn=db_config.dsn
 )
 
-run_sql_script.run_sql_script(con, "create_task_table")
+run_sql_script.run_sql_script(con, "create_task_table", user=db_config.user)
 
 print("Done.")
