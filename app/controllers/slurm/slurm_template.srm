@@ -16,4 +16,4 @@ JOBNAME=$SLURM_JOB_NAME
 echo "JOBNAME: " $JOBNAME
 
 # TODO: check if container.sif exists
-singularity run --nv -B {atena_root} {sif_path}/{image_name}.sif python3 {atena_root}/false_NFS/scripts/{task_id}/{script_name} --input_path={atena_root}/datasets/{dataset_name} --output_path={atena_root}/false_NFS/scripts/output
+singularity run --nv -B {atena_root} {sif_path}/{image_name}.sif python3 {atena_root}/false_NFS/scripts/{task_id}/{script_name} --input_path={atena_root}/datasets/{dataset_name} --output_path={atena_root}/false_NFS/scripts/{task_id}
