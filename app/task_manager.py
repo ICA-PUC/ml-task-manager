@@ -1,20 +1,26 @@
 """Task Manager class module"""
 import json
+from fastapi import UploadFile
 import datetime
 import random
 from fastapi import status
 from . import utils
 from .controllers.slurm.slurm_manager import prepare_srm_template
+from .file_manager import FileManager
 
 
 class TaskManager():
     """Class Manager for all task related logic"""
 
-    def __init__(self, task_id, py_name, conf_path):
+    def __init__(self, task_id):
         self.task_id = task_id
-        self.py_name = py_name
+        self.py_name = None
         self.task_dict = None
-        self.conf_path = conf_path
+        self.conf_path = None
+        self.file_manager = FileManager()
+
+    async def process_files(self, files: list[UploadFile]):
+        self.py_name, self.conf_path = await self.file_manager.process_files(files, self.task_id)
 
     def _load_json(self, path: str) -> dict:
         """Loads json file and returns as a dictionary"""

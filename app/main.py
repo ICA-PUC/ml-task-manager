@@ -56,15 +56,8 @@ async def create_task(files: list[UploadFile],
                       usr_token: Annotated[User, Depends(get_current_user)]):
     """Create new task and save it to DB"""
     task_id = utils.create_task_id()
-    for file in files:
-        fname = file.filename
-        fdata = await file.read()
-        fpath = utils.save_file(fname, fdata, task_id)
-        if ".json" in fname:
-            conf_path = fpath
-        if ".py" in fname:
-            py_name = fname
-    task_manager = TaskManager(task_id, py_name, conf_path)
+    task_manager = TaskManager(task_id)
+    await task_manager.process_files(files)
     output = task_manager.run_task()
     dbm.insert_task(output)
     return dbm.get_task_by_id(output['id'])

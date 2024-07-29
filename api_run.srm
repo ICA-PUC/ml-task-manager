@@ -15,6 +15,7 @@ echo "JOB ID: " $SLURM_JOBID
 echo "JOB NAME: " $SLURM_JOB_NAME
 
 export ATENA_ROOT=/nethome/projetos30/arcabouco_ml
+export NFS_ROOT=/nethome/projetos30/arcabouco_ml/false_NFS
 export ROOT_API=$ATENA_ROOT/lucas/ml-task-manager
 export SIF_PATH=/nethome/projetos30/arcabouco_ml/singularities/
 
