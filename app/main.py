@@ -4,6 +4,7 @@ from . import utils
 from .controllers.ssh.handler import RemoteHandler
 from .db_manager import DBManager
 from .task_manager import TaskManager
+from .file_manager import FileManager
 
 
 dbm = DBManager()
@@ -24,15 +25,8 @@ def dev_connect():
 async def create_task(files: list[UploadFile]):
     """Create new task and save it to DB"""
     task_id = utils.create_task_id()
-    for file in files:
-        fname = file.filename
-        fdata = await file.read()
-        fpath = utils.save_file(fname, fdata, task_id)
-        if ".json" in fname:
-            conf_path = fpath
-        if ".py" in fname:
-            py_name = fname
-    task_manager = TaskManager(task_id, py_name, conf_path)
+    task_manager = TaskManager(task_id)
+    await task_manager.process_files(files)
     output = task_manager.run_task()
     dbm.insert_task(output)
     return dbm.get_task_by_id(output['id'])
