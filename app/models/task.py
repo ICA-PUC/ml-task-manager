@@ -18,8 +18,8 @@ class TaskBase(SQLModel):
     job_id: int
 
 
-class ffir_twincore_task(TaskBase, table=True):
-    """Task class that will generate the table in database
+class fg1n_twincore_task(TaskBase, table=True):
+    """Task class that will reference the table in database
 
     :param TaskBase: The base model class
     :type TaskBase: SQLModel
@@ -27,20 +27,3 @@ class ffir_twincore_task(TaskBase, table=True):
     :type table: bool, optional
     """
     id: str | None = Field(default=None, primary_key=True)
-
-
-class TaskCreate(TaskBase):
-    """Task class that will be returned upon instance creation
-
-    :param TaskBase: The base model class
-    :type TaskBase: SQLModel
-    """
-
-
-class TaskRead(TaskBase):
-    """Task class that will be returned upon get status requests
-
-    :param TaskBase: The base model class
-    :type TaskBase: SQLModel
-    """
-    id: str
