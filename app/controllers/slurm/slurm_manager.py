@@ -15,13 +15,10 @@ def prepare_srm_template(task_dict):
     if "atena" in task_dict['runner_location']:
         if task_dict['execution_mode'] == "mlflow":
             template = read_template("app/controllers/slurm/slurm_template_with_mlflow.srm")
-            print("=========================== mlflow")
         else:
             template = read_template("app/controllers/slurm/slurm_template.srm")
-            print("=========================== NO mlflow")
     elif "dev" in task_dict['runner_location']:
         template = read_template("app/controllers/slurm/dev_template.srm")
-        print("=========================== dev")
     slurm_script = template.format(
         experiment_name=task_dict['experiment_name'],
         instance_type=task_dict['instance_type'],
