@@ -18,5 +18,5 @@ echo "JOBNAME: " $JOBNAME
 # TODO: check if container.sif exists
 
 singularity run --nv -B {atena_root} \
-{sif_path}/{image_name}.sif \
+{sif_path}/teste_sif_mlflow_miniforge_py310_mlflow2_14.sif \
 mlflow run {project_root}

@@ -52,6 +52,7 @@ class TaskManager():
 
         # Extract backend execution configuration based on execution_mode
         execution_mode = configuration['execution_mode']
+        filtered_configuration['execution_mode'] = configuration['execution_mode']
         backend_execution_config = configuration['backend_execution'][execution_mode]['execution_config']
         for key, value in backend_execution_config.items():
             filtered_configuration[key] = value
