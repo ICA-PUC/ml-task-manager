@@ -41,7 +41,7 @@ class TaskManager():
         }
         target_cluster = configuration['runner_location']
         general_configuration = ['runner_location', 'dataset_name',
-                                 'script_path', 'experiment_name']
+                                 'script_path','project_path', 'experiment_name']
 
         for parameters in general_configuration:
             filtered_configuration[parameters] = configuration[parameters]
@@ -49,6 +49,16 @@ class TaskManager():
         for parameters in cluster_configuration[target_cluster]:
             cluster_parameters = configuration['clusters'][target_cluster]['infra_config'][parameters]
             filtered_configuration[parameters] = cluster_parameters
+
+        # Extract backend execution configuration based on execution_mode
+        execution_mode = configuration['execution_mode']
+        backend_execution_config = configuration['backend_execution'][execution_mode]['execution_config']
+        for key, value in backend_execution_config.items():
+            filtered_configuration[key] = value
+
+        print(filtered_configuration)
+        
+
         return filtered_configuration
 
     def _create_task_id(self):
