@@ -1,0 +1,23 @@
+Bootstrap: docker
+From: nexus.petrobras.com.br:5000/python:3.10.11
+
+%post
+    echo 'deb [trusted=yes] https://nexus.petrobras.com.br/nexus/repository/apt-debian-deb-bullseye/ bullseye main' > /etc/apt/sources.list
+    echo 'deb [trusted=yes] https://nexus.petrobras.com.br/nexus/repository/apt-debian-deb-bullseye/ bullseye main' > /etc/apt/sources.list
+    pip config set global.index https://nexus.petrobras.com.br/nexus/repository/pypi-all/pypi
+    pip config set global.index-url https://nexus.petrobras.com.br/nexus/repository/pypi-all/simple
+    pip config set global.trusted-host "pypi.org pypi.python.org files.pythonhosted.org nexus.petrobras.com.br"`
+    apt-get update && apt-get upgrade -y
+    pip install --upgrade pip
+    wget https://nexus.petrobras.com.br/nexus/repository/pypi-internal/packages/python-cav4/1.1.1/python_cav4-1.1.1-py3-none-any.whl --no-check-certificate
+    python3 -m pip install python_cav4-1.1.1-py3-non-any.whl
+
+%files
+    ./requirements.txt /requirements.txt
+
+%environment
+    export PYTHONUNBUFFERED=1
+    export PYTHONDONTWRITEBYTECODE=1
+
+%post
+    pip install -r /requirements.txt
