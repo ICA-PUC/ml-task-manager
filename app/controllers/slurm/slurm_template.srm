@@ -15,15 +15,7 @@ echo "SLURM_JOBID: " $SLURM_JOBID
 JOBNAME=$SLURM_JOB_NAME
 echo "JOBNAME: " $JOBNAME
 
-export HTTP_PROXY=http://ffir:L24v19l15!@inet-sys.petrobras.com.br:804
-export HTTPS_PROXY=$HTTP_PROXY
-export http_proxy=$HTTP_PROXY
-export https proxy=$HTTP_PROXY
-export https_proxy=$HTTP_PROXY
-
-# Print proxy variables to verify they are set correctly
-echo "HTTP_PROXY: $HTTP_PROXY"
-echo "HTTPS_PROXY: $HTTPS_PROXY"
+source $HOME/proxy.sh
 
 # Check MLflow version
 singularity exec {sif_path}/teste_sif_mlflow_miniforge_py310_mlflow2_14.sif mlflow --version
