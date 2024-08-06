@@ -41,7 +41,7 @@ class TaskManager():
         target_cluster = configuration['runner_location']
         general_configuration = ['runner_location', 'dataset_name',
                                  'script_path', 'project_path',
-                                 'experiment_name']
+                                 'experiment_name', 'command']
 
         for parameters in general_configuration:
             filtered_configuration[parameters] = configuration[parameters]
