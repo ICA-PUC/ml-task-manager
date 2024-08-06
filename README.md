@@ -133,32 +133,70 @@ Here is a sample of the config JSON file and a brief description of the required
 
 ```JSON
 {
-  "dataset_name": "wine_classification",
-  "model_params": {
-    "n_estimators": 2,
-    "random_state": 42
-  },
-  "runner_location": "atena02",
-  "model_tracking": true,
-  "tracking_uri": "experiments",
-  "experiment_name": "atena_test",
-  "script_path": "path/to/script.py",
-  "clusters": {
-    "atena02": {
-      "infra_config": {
-        "instance_type": "cpu",
-        "image_name": "sklearn_sample_latest",
-        "account": "twinscie"
+    "dataset_name": "adult.csv",
+
+    "model_params": {
+      "n_estimators": 2,
+      "random_state": 42
+    },
+
+    "runner_location": "atena02",
+    "execution_mode": "mlflow",
+    "experiment_name": "atena_test",
+    "project_path": "path/to/ml project",
+    "script_path": "path/to/script.py",
+    "clusters": {
+      "atena02": {
+        "infra_config": {
+          "instance_type": "gpu",
+          "image_name":"teste_sif_py310_miniforge3",
+          "account": "twinscie"
+        }
       }
+    },
+    "backend_execution":{
+        "mlflow": {
+          "execution_config": {
+            "execution_mode": "mlflow",
+            "tracking_uri": "http://server:5000/"
+          }
+        },
+        "no-mlflow": {
+          "execution_config": { }
+        }
     }
   }
-}
 ```
 
 - **dataset_name**: The name of the dataset `.csv` file.
+- **model_params**: Parameters used into the model (e.g `n_estimators`, `random_state`, etc.)
+- **execution_mode**: Key to select between the running using mlflow or not
 - **runner_location**: Name of the target cluster (e.g `atena02`, `aws`, `azure`, etc.)
 - **experiment_name**: Name of the experiment.
+- **project_path**: Path to the mlflow project
+- **script_path**: Path to the script.py
 - **script_name**: Name of the entrypoint script.
-- **instance_type**: The kind of slurm instance to host the job.
-- **image_name**: The name of the `.sif` image to run the experiment.
-- **account**: Slurm user and job owner's account name.
+- **clusters**: key that organizes the information of the different types of environments
+  - **atena02**:
+    - **instance_type**: The kind of slurm instance to host the job.
+    - **image_name**: The name of the `.sif` image to run the experiment.
+    - **account**: Slurm user and job owner's account name.
+- **backend_execution**: key that organizes the execution configuration information via MLFLOW
+  - **mlflow**:
+    - **tracking_uri**: Uri where mlflow information will be stored.
+
+
+
+## Proxy instructions
+
+Here we will describe how to properly configure the proxy to allow the connections http or https. You should create a proxy.sh inside your $HOME, because the slurm_template.srm will use this to provide the connections.
+
+```sh
+#!/bin/sh
+
+export HTTP_PROXY=http://<chave>:<senha>@inet-sys.petrobras.com.br:804
+export HTTPS_PROXY=$HTTP_PROXY
+export http_proxy=$HTTP_PROXY
+export http proxy=$HTTP_PROXY
+export https_proxy=$HTTP_PROXY
+```
