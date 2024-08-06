@@ -13,7 +13,7 @@ class User(SQLModel):
     full_name: str | None = None
 
 
-class fg1n_twincore_user(User, table=True):
+class ffir_twincore_user(User, table=True):
     """User class that will reference the table in database"""
     id: str | None = Field(default=None, primary_key=True)
     hashed_password: str
