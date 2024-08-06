@@ -10,7 +10,6 @@ from app.models.token import Token, TokenData
 from app.security_manager import SecManager
 from app.db_manager import DBManager
 from app.task_manager import TaskManager
-import os
 
 dbm = DBManager()
 app = FastAPI()
@@ -86,9 +85,7 @@ async def get_job_status(job_id: int,
     output = remote.get_output()[0]
     job_status = output.split()[4]
     task = dbm.get_task_by_job_id(job_id)
-    # path_to_search = task['project_path']
-    path_to_search = '/nethome/projetos30/arcabouco_ml/false_NFS/twinscie_folder/measurements_regression_training_right_vinicius'
-    run_id = utils.get_mlflow_run_id(path_to_search)
+    run_id = utils.get_mlflow_run_id(task)
     response_data = {
         "job_status": utils.get_status_message(job_status),
         "run_id": run_id if run_id else "run_id não encontrado"
