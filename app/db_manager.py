@@ -69,5 +69,5 @@ class DBManager:
         """Retreive single task from database given ID"""
         with Session(self.engine) as session:
             statement = select(Task).where(Task.job_id == job_id)
-            results = session.exec(statement).all()
+            results = session.exec(statement).one()
             return results
