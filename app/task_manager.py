@@ -1,12 +1,10 @@
 """Task Manager class module"""
-import json
-from fastapi import UploadFile
 import datetime
 import random
+import json
+from fastapi import UploadFile
 from fastapi import status
 from . import utils
-from .controllers.slurm.slurm_manager import prepare_srm_template
-from .file_manager import FileManager
 
 
 class TaskManager():
@@ -17,10 +15,11 @@ class TaskManager():
         self.py_name = None
         self.task_dict = None
         self.conf_path = None
-        self.file_manager = FileManager()
 
     async def process_files(self, files: list[UploadFile]):
-        self.py_name, self.conf_path = await self.file_manager.process_files(files, self.task_id)
+        """Process uploaded files"""
+        self.py_name, self.conf_path = await utils.process_files(files,
+                                                                 self.task_id)
 
     def _load_json(self, path: str) -> dict:
         """Loads json file and returns as a dictionary"""
@@ -41,7 +40,8 @@ class TaskManager():
         }
         target_cluster = configuration['runner_location']
         general_configuration = ['runner_location', 'dataset_name',
-                                 'script_path','project_path', 'experiment_name']
+                                 'script_path', 'project_path',
+                                 'experiment_name']
 
         for parameters in general_configuration:
             filtered_configuration[parameters] = configuration[parameters]
@@ -58,7 +58,6 @@ class TaskManager():
             filtered_configuration[key] = value
 
         print(filtered_configuration)
-        
 
         return filtered_configuration
 
@@ -79,7 +78,7 @@ class TaskManager():
         remote = utils.atena_connect()
         utils.atena_upload(self._strip_filename(
             self.task_dict['script_path']), remote, self.task_dict['id'])
-        srm_name = prepare_srm_template(self.task_dict)
+        srm_name = utils.prepare_srm_template(self.task_dict)
         srm_path = utils.atena_upload(srm_name, remote, self.task_dict['id'])
         remote.exec(f"sbatch {srm_path}")
         output_tuple = remote.get_output()

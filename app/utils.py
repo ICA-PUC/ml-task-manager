@@ -4,18 +4,13 @@ import json
 import datetime
 import random
 import os
-#################
-# temp auxiliar #
-#################
-from fastapi import status
+from fastapi import status, UploadFile
 from .controllers.ssh.handler import RemoteHandler
-#################
 from .config import settings
 
 
 def save_file(filename: str, filedata: bin, task_id: str) -> str:
     """Save file to disk"""
-    # root = settings.atena_root
     root = settings.nfs_root
     folder_destination = 'scripts'
     fpath = f"{root}/{folder_destination}/{str(task_id)}"
@@ -106,6 +101,65 @@ def create_task_id() -> str:
     task_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f') + \
         f"{random.randint(0, 9999):04d}"
     return task_id
+
+
+def read_file(file_path):
+    """read file given path"""
+    with open(file_path, "r", encoding='utf-8') as f:
+        file_data = f.read()
+    return file_data
+
+
+async def process_files(files: list[UploadFile],
+                        task_id: int) -> tuple:
+    """Process the received list of files
+
+    :param files: list of files uploaded
+    :type files: list[UploadFile]
+    :param task_id: task identifier number
+    :type task_id: int
+    :return: name of python file and name of config file
+    :rtype: tuple
+    """
+    for file in files:
+        fname = file.filename
+        fdata = await file.read()
+        fpath = save_file(fname, fdata, task_id)
+        if fname.endswith(".json"):
+            conf_path = fpath
+        if fname.endswith(".py"):
+            py_name = fname
+
+    return py_name, conf_path
+
+
+def prepare_srm_template(task_dict):
+    """Prepare srm template with task_dict"""
+    if "atena" in task_dict['runner_location']:
+        if task_dict['execution_mode'] == "mlflow":
+            template = read_file(
+                "app/controllers/slurm/slurm_template_with_mlflow.srm")
+        else:
+            template = read_file(
+                "app/controllers/slurm/new_slurm_template.srm")
+    slurm_script = template.format(
+        experiment_name=task_dict['experiment_name'],
+        instance_type=task_dict['instance_type'],
+        account=task_dict['account'],
+        image_name=task_dict['image_name'],
+        script_name=strip_filename(task_dict['script_path']),
+        dataset_name=task_dict['dataset_name'],
+        task_id=task_dict['id'],
+        sif_path=settings.sif_root,
+        atena_root=settings.atena_root,
+        nfs_root=settings.nfs_root,
+        project_root=task_dict['project_path'],
+        command=task_dict['command']
+    )
+    fname = f'slurm_script_{task_dict["id"]}.srm'
+    save_file(fname, slurm_script, task_dict["id"])
+    return fname
+
 
 # Temporary functions that will be replaced into class
 

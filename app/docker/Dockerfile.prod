@@ -1,8 +1,24 @@
-FROM tiangolo/uvicorn-gunicorn:python3.11-slim
+FROM nexus.petrobras.com.br:5000/python:3.10.11
 
-RUN apt-get update && apt-get install -y netcat-openbsd
+# Configuração do proxy para o apt-get
+RUN echo 'deb [trusted=yes] https://nexus.petrobras.com.br/nexus/repository/apt-debian-deb-bullseye/ bullseye main' > /etc/apt/sources.list
+RUN echo 'deb [trusted=yes] https://nexus.petrobras.com.br/nexus/repository/apt-debian-deb-bullseye-updates/ bullseye main' >> /etc/apt/sources.list
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+# Repositorio pip interno
+RUN pip config set global.index https://nexus.petrobras.com.br/nexus/repository/pypi-all/pypi
+RUN pip config set global.index-url https://nexus.petrobras.com.br/nexus/repository/pypi-all/simple
+RUN pip config set global.trusted-host "pypi.org pypi.python.org files.pythonhosted.org nexus.petrobras.com.br"
+
+RUN apt-get update
+RUN apt-get upgrade
+RUN pip install --upgrade pip
+
+# Download the wheel file from the URL
+RUN wget https://nexus.petrobras.com.br/nexus/repository/pypi-internal/packages/python-cav4/1.1.1/python_cav4-1.1.1-py3-none-any.whl --no-check-certificate
+
+# Install the wheel file using pip
+RUN python3 -m pip install python_cav4-1.1.1-py3-none-any.whl
 
 COPY . .
+ENV PYTHONUNBUFFERED=1
+RUN pip install -r requirements.txt

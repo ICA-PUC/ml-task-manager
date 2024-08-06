@@ -85,13 +85,3 @@ async def get_job_status(job_id: int,
     output = remote.get_output()[0]
     job_status = output.split()[4]
     return utils.get_status_message(job_status)
-
-
-@app.get("/users/")
-async def get_users():
-    return dbm.get_users()
-
-
-@app.get("/users/{username}")
-async def get_user(username: str):
-    return dbm.get_user_by_name(username)

@@ -7,7 +7,7 @@
 #SBATCH --ntasks=1              #Numero de tarefas
 #SBATCH --exclusive
 #SBATCH --exclude atn1b01n16,atn1b01n08,atn1b03n25,atn1b01n19
-#SBATCH -o ./job_output.txt
+#SBATCH -o {atena_root}/false_NFS/scripts/{task_id}/job_%j.txt
 
 echo "CUDA_VISIBLE_DEVICES: " $CUDA_VISIBLE_DEVICES
 echo $SLURM_JOB_NODELIST
@@ -16,4 +16,6 @@ JOBNAME=$SLURM_JOB_NAME
 echo "JOBNAME: " $JOBNAME
 
 # TODO: check if container.sif exists
-python3 {script_path} input_path=./{dataset_name} output_path=./
+unzip {script_name}
+
+singularity run --nv -B {atena_root} {sif_path}/{image_name}.sif {command}
