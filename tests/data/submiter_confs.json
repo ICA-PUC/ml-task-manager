@@ -1,14 +1,17 @@
 {
-    "dataset_name": "BostonHousing",
+    "dataset_name": "adult.csv",
+
     "model_params": {
       "n_estimators": 2,
       "random_state": 42
     },
+
     "runner_location": "atena02",
-    "model_tracking": true,
-    "tracking_uri": "experiments",
+    "execution_mode": "no-mlflow",
     "experiment_name": "atena_test",
-    "script_path": "./test.py",
+    "project_path": "/nethome/projetos30/arcabouco_ml/false_NFS/twinscie_folder/measurements_regression_training_right/",
+    "script_path": "/nethome/projetos30/arcabouco_ml/lucas/ml-task-manager/tests/data/files.zip",
+    "command": "python3 files/test.py",
     "clusters": {
       "dev": {
         "infra_config": {
@@ -20,10 +23,11 @@
       "atena02": {
         "infra_config": {
           "instance_type": "cpu",
-          "image_name":"sklearn_sample_latest",
+          "image_name":"teste_sif_mlflow_miniforge_py310_mlflow2_14",
           "account": "twinscie"
         }
       },
+      
       "aws": {
         "infra_config": {
           "role": "arn:aws:iam::example",
@@ -33,6 +37,17 @@
           "prefix_name":"SklearnWineV2"
         }
       }
+    },
+    "backend_execution":{
+        "mlflow": {
+          "execution_config": {
+            "execution_mode": "mlflow",
+            "tracking_uri": "http://npab1420.petrobras.biz:5000/"
+          }
+        },
+        "no-mlflow": {
+          "execution_config": { }
+        }
     }
   }
   

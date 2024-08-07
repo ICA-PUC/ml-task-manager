@@ -103,7 +103,7 @@ class TaskManager():
         if not self._is_file_name_equal():
             return_msg = {
                 "msg": f"{self.task_dict['script_path']} \
-                            and {self.task_dict['py_name']} must be equal!",
+                            and {self.py_name} must be equal!",
                 "status": status.HTTP_400_BAD_REQUEST
             }
             return return_msg
