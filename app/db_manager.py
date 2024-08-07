@@ -1,8 +1,8 @@
 """Database Manager module"""
 from sqlmodel import create_engine, Session, select
 from app.config import settings
-from app.models.task import fg1n_twincore_task as Task
-from app.models.user import fg1n_twincore_user as User
+from app.models.task import ffir_twincore_task as Task
+from app.models.user import ffir_twincore_user as User
 
 
 class DBManager:
@@ -63,4 +63,11 @@ class DBManager:
         with Session(self.engine) as session:
             statement = select(User).where(User.username == username)
             results = session.exec(statement).one()
+            return results
+
+    def get_task_by_job_id(self, job_id):
+        """Retreive single task from database given ID"""
+        with Session(self.engine) as session:
+            statement = select(Task).where(Task.job_id == job_id)
+            results = session.exec(statement).all()
             return results

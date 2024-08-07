@@ -184,3 +184,23 @@ def atena_connect():
     passwd = settings.env_confs['ATENA_PASSWD']
     remote.connect(host, user, passwd)
     return remote
+
+def get_mlflow_run_id(task):
+    # path_to_search = task['project_path']
+    task = '/nethome/projetos30/arcabouco_ml/false_NFS/twinscie_folder/measurements_regression_training_right_vinicius'
+    path_to_search = task
+    target_file = "run_mlflow_config.txt"
+    target_path = f"{path_to_search}/{target_file}"
+    files_and_dirs = os.listdir(path_to_search)
+    if  target_file in files_and_dirs:
+        with open(target_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+        run_id = None
+        for line in content.splitlines():
+            if line.startswith('run_id:'):
+                run_id = line.split(':', 1)[1].strip()
+                break
+    if run_id:
+        return run_id
+    else:
+        return "Arquivo 'run_mlflow_config.txt' não encontrado no diretório."

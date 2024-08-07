@@ -18,7 +18,7 @@ class TaskBase(SQLModel):
     job_id: int
 
 
-class fg1n_twincore_task(TaskBase, table=True):
+class ffir_twincore_task(TaskBase, table=True):
     """Task class that will reference the table in database
 
     :param TaskBase: The base model class

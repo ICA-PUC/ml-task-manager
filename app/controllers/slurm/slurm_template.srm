@@ -15,5 +15,10 @@ echo "SLURM_JOBID: " $SLURM_JOBID
 JOBNAME=$SLURM_JOB_NAME
 echo "JOBNAME: " $JOBNAME
 
+source $HOME/proxy.sh
+
+# Check MLflow version
+singularity exec {sif_path}/teste_sif_mlflow_miniforge_py310_mlflow2_14.sif mlflow --version
+
 # TODO: check if container.sif exists
 singularity run --nv -B {atena_root} {sif_path}/{image_name}.sif python3 {atena_root}/false_NFS/scripts/{task_id}/{script_name} --input_path={atena_root}/datasets/{dataset_name} --output_path={atena_root}/false_NFS/scripts/{task_id}
