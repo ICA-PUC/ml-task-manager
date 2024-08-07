@@ -10,7 +10,7 @@ url = f"http://{node_name}:8008/new_task"
 headers = {'accept': 'application/json',
            'Authorization': f"{auth['token_type']} {auth['access_token']}"}
 files = [("files", open("data/submiter_confs.json", "rb")),
-         ("files", open("data/test.py", "rb"))]
+         ("files", open("data/files.zip", "rb"))]
 
 print("antes de enviar")
 response = requests.post(url, headers=headers, files=files, timeout=10)

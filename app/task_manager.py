@@ -69,10 +69,6 @@ class TaskManager():
         self.task_dict = self._process_configuration()
         self.task_dict['id'] = self.task_id
 
-    def _is_file_name_equal(self):
-        script_name = self._strip_filename(self.task_dict['script_path'])
-        return script_name == self.py_name
-
     def _create_atena_task(self):
         """Create and submit a new task to atena"""
         remote = utils.atena_connect()
@@ -100,16 +96,7 @@ class TaskManager():
     def run_task(self):
         """Run a new task"""
         self._config_task_dict()
-        if not self._is_file_name_equal():
-            return_msg = {
-                "msg": f"{self.task_dict['script_path']} \
-                            and {self.py_name} must be equal!",
-                "status": status.HTTP_400_BAD_REQUEST
-            }
-            return return_msg
-
         task_output_tuple = self._create_task()
-
         if task_output_tuple[0]:
             text = task_output_tuple[0].strip()
             job_id = text.split('Submitted batch job ')[1].strip()
