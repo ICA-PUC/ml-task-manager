@@ -1,10 +1,12 @@
 """Task Manager class module"""
+import os
 import datetime
 import random
+import hashlib
 import json
 from fastapi import UploadFile
-from fastapi import status
 from . import utils
+from .config import settings
 
 
 class TaskManager():
@@ -16,11 +18,6 @@ class TaskManager():
         self.task_dict = None
         self.conf_path = None
 
-    async def process_files(self, files: list[UploadFile]):
-        """Process uploaded files"""
-        self.py_name, self.conf_path = await utils.process_files(files,
-                                                                 self.task_id)
-
     def _load_json(self, path: str) -> dict:
         """Loads json file and returns as a dictionary"""
         with open(path, encoding='utf-8') as f:
@@ -29,6 +26,42 @@ class TaskManager():
     def _strip_filename(self, file_path: str) -> str:
         """Strip filename from a path"""
         return file_path.split('/')[-1]
+
+    async def process_files(self, files: list[UploadFile],
+                            task_id: int) -> tuple:
+        """Process the received list of files
+
+        :param files: list of files uploaded
+        :type files: list[UploadFile]
+        :param task_id: task identifier number
+        :type task_id: int
+        :return: name of python file and name of config file
+        :rtype: tuple
+        """
+        for file in files:
+            fname = file.filename
+            fdata = await file.read()
+            fpath = self._save_file(fname, fdata, task_id)
+            if fname.endswith(".json"):
+                self.conf_path = fpath
+            if fname.endswith(".py"):
+                self.py_name = fname
+
+    def _save_file(self, filename: str, filedata: bin, task_id: str) -> str:
+        """Save file to disk"""
+        root = settings.nfs_root
+        folder_destination = 'scripts'
+        fpath = f"{root}/{folder_destination}/{str(task_id)}"
+        os.makedirs(fpath, exist_ok=True)
+        fpath = f"{root}/scripts/{str(task_id)}/{filename}"
+        if isinstance(filedata, str):
+            filedata = filedata.encode('utf-8')
+        with open(fpath, 'wb') as f:
+            f.write(filedata)
+            with open(f"{fpath}.md5", "wb") as f:
+                hashmd5 = hashlib.md5(filedata).hexdigest()
+                f.write(hashmd5.encode())
+        return fpath
 
     def _process_configuration(self) -> dict:
         """Process configuration file"""

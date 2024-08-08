@@ -1,29 +1,11 @@
 """Utility functions module"""
-import hashlib
 import json
 import datetime
 import random
 import os
-from fastapi import status, UploadFile
+from fastapi import status
 from .controllers.ssh.handler import RemoteHandler
 from .config import settings
-
-
-def save_file(filename: str, filedata: bin, task_id: str) -> str:
-    """Save file to disk"""
-    root = settings.nfs_root
-    folder_destination = 'scripts'
-    fpath = f"{root}/{folder_destination}/{str(task_id)}"
-    os.makedirs(fpath, exist_ok=True)
-    fpath = f"{root}/scripts/{str(task_id)}/{filename}"
-    if isinstance(filedata, str):
-        filedata = filedata.encode('utf-8')
-    with open(fpath, 'wb') as f:
-        f.write(filedata)
-        with open(f"{fpath}.md5", "wb") as f:
-            hashmd5 = hashlib.md5(filedata).hexdigest()
-            f.write(hashmd5.encode())
-    return fpath
 
 
 def load_json(path: str) -> dict:
@@ -110,29 +92,6 @@ def read_file(file_path):
     return file_data
 
 
-async def process_files(files: list[UploadFile],
-                        task_id: int) -> tuple:
-    """Process the received list of files
-
-    :param files: list of files uploaded
-    :type files: list[UploadFile]
-    :param task_id: task identifier number
-    :type task_id: int
-    :return: name of python file and name of config file
-    :rtype: tuple
-    """
-    for file in files:
-        fname = file.filename
-        fdata = await file.read()
-        fpath = save_file(fname, fdata, task_id)
-        if fname.endswith(".json"):
-            conf_path = fpath
-        if fname.endswith(".py"):
-            py_name = fname
-
-    return py_name, conf_path
-
-
 def prepare_srm_template(task_dict):
     """Prepare srm template with task_dict"""
     if "atena" in task_dict['runner_location']:
@@ -185,6 +144,7 @@ def atena_connect():
     remote.connect(host, user, passwd)
     return remote
 
+
 def get_mlflow_run_id(task):
     # path_to_search = task['project_path']
     task = '/nethome/projetos30/arcabouco_ml/false_NFS/twinscie_folder/measurements_regression_training_right_vinicius'
@@ -192,7 +152,7 @@ def get_mlflow_run_id(task):
     target_file = "run_mlflow_config.txt"
     target_path = f"{path_to_search}/{target_file}"
     files_and_dirs = os.listdir(path_to_search)
-    if  target_file in files_and_dirs:
+    if target_file in files_and_dirs:
         with open(target_path, 'r', encoding='utf-8') as file:
             content = file.read()
         run_id = None

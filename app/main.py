@@ -10,7 +10,6 @@ from app.models.token import Token, TokenData
 from app.security_manager import SecManager
 from app.db_manager import DBManager
 from app.task_manager import TaskManager
-import os
 
 dbm = DBManager()
 app = FastAPI()
