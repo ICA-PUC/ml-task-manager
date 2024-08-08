@@ -17,6 +17,14 @@ echo "JOBNAME: " $JOBNAME
 
 # TODO: check if container.sif exists
 
+source /u/ffir/.bashrc
+
+
+
+bash /u/ffir/echo_proxy.sh
+
+echo "depois echo"
+
 singularity run --nv -B {atena_root} \
-{sif_path}/teste_sif_mlflow_miniforge_py310_mlflow2_14.sif \
-mlflow run {project_root}
+{sif_path}/teste_sif_py310_miniforge3.sif \
+bash -c "export GIT_PYTHON_REFRESH=quiet && export MLFLOW_CONDA_HOME=/miniforge3 && /miniforge3/bin/conda init && source /u/ffir/.bashrc && export MLFLOW_TRACKING_URI=http://npab1420.petrobras.biz:5000 && mlflow run --experiment-name {experiment_name} {project_root}"
