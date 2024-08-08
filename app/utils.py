@@ -132,9 +132,7 @@ def atena_connect():
     return remote
 
 def get_mlflow_run_id(task):
-    # path_to_search = task['project_path']
-    task = '/nethome/projetos30/arcabouco_ml/false_NFS/twinscie_folder/measurements_regression_training_right_vinicius'
-    path_to_search = task
+    path_to_search = task.project_path
     target_file = "run_mlflow_config.txt"
     target_path = f"{path_to_search}/{target_file}"
     files_and_dirs = os.listdir(path_to_search)

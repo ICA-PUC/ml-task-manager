@@ -16,6 +16,7 @@ class TaskBase(SQLModel):
     dataset_name: str
     experiment_name: str
     job_id: int
+    project_path: str
 
 
 class ffir_twincore_task(TaskBase, table=True):

@@ -7,5 +7,6 @@ create table ffir_twincore_task
          SCRIPT_PATH nvarchar2(200) not null,
          DATASET_NAME nvarchar2(100) not null,
          EXPERIMENT_NAME nvarchar2(100) not null,
-         JOB_ID number(10) not null)
+         JOB_ID number(10) not null,
+         PROJECT_PATH nvarchar2(200) not null)
 /
