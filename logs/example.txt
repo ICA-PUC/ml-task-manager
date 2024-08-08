@@ -1,0 +1,35 @@
+2024-08-08 10:11:31,610 - BigAnchoring-ML-Module.Environment - INFO - -------------------------------------------------------------
+2024-08-08 10:11:31,610 - BigAnchoring-ML-Module.Environment - INFO - ---- Inicializacao do Servidor do BigAnchoring Module ML ----
+2024-08-08 10:11:31,610 - BigAnchoring-ML-Module.Environment - INFO - -------------------------------------------------------------
+2024-08-08 10:11:31,611 - BigAnchoring-ML-Module.Environment - INFO - CUDA_VISIBLE_DEVICES: 0,1,2,3,4,5,6,7
+2024-08-08 10:11:31,611 - BigAnchoring-ML-Module.Environment - INFO - SLURM_JOB_NODELIST: <NODE_NAME>
+2024-08-08 10:11:31,611 - BigAnchoring-ML-Module.Environment - INFO - SLURM_JOB ID: 5412716
+2024-08-08 10:11:31,611 - BigAnchoring-ML-Module.Environment - INFO - SLURM_JOB NAME: twinscie_teste_api
+2024-08-08 10:16:28,817 - BigAnchoring-ML-Module.main - INFO - Login endpoint
+2024-08-08 10:16:29,297 - BigAnchoring-ML-Module.main - INFO - Token criado com sucesso!
+2024-08-08 10:16:29,324 - BigAnchoring-ML-Module.main - INFO - ----------------------------
+2024-08-08 10:16:29,324 - BigAnchoring-ML-Module.main - INFO - Criacao de uma nova task
+2024-08-08 10:16:29,324 - BigAnchoring-ML-Module.main - INFO - ----------------------------
+2024-08-08 10:16:29,324 - BigAnchoring-ML-Module.main - INFO - task_id gerado com sucesso
+2024-08-08 10:16:29,324 - BigAnchoring-ML-Module.main - DEBUG - task_id : 202408081016293242249283
+2024-08-08 10:16:29,324 - BigAnchoring-ML-Module.main - INFO - TaskManager instanciada com sucesso
+2024-08-08 10:16:29,334 - BigAnchoring-ML-Module.main - INFO - Processamento dos arquivos realizado com sucesso
+2024-08-08 10:16:29,864 - BigAnchoring-ML-Module.main - INFO - Task submetida com sucesso
+2024-08-08 10:16:29,918 - BigAnchoring-ML-Module.main - INFO - Informacoes da task armazendas com sucesso
+2024-08-08 10:16:29,918 - BigAnchoring-ML-Module.main - INFO - ---------------------------------
+2024-08-08 10:16:29,918 - BigAnchoring-ML-Module.main - INFO - Nova task criada com sucesso!
+2024-08-08 10:16:29,918 - BigAnchoring-ML-Module.main - INFO - ---------------------------------
+2024-08-08 10:17:08,240 - BigAnchoring-ML-Module.main - INFO - Login endpoint
+2024-08-08 10:17:08,465 - BigAnchoring-ML-Module.main - INFO - Token criado com sucesso!
+2024-08-08 10:17:08,476 - BigAnchoring-ML-Module.main - INFO - -----------------------------------------
+2024-08-08 10:17:08,476 - BigAnchoring-ML-Module.main - INFO - Nova requisicao para o status do job!
+2024-08-08 10:17:08,476 - BigAnchoring-ML-Module.main - INFO - -----------------------------------------
+2024-08-08 10:17:08,476 - BigAnchoring-ML-Module.main - DEBUG - job_id : 5412733
+2024-08-08 10:17:08,753 - BigAnchoring-ML-Module.main - INFO - Conexao realizada com sucesso
+2024-08-08 10:17:08,846 - BigAnchoring-ML-Module.main - DEBUG - Informacoes do no solicitado:            5412733       gpu atena_te     ffir  R       0:38      1 atn2b03n03
+2024-08-08 10:17:08,846 - BigAnchoring-ML-Module.main - DEBUG - Requisicao ao task DB em funcao ao job_id: 5412733
+2024-08-08 10:17:08,852 - BigAnchoring-ML-Module.main - DEBUG - Resultado da requisicao ao task DB : runner_location='atena02' instance_type='gpu' dataset_name='adult.csv' job_id=5412733 id='202408081016293242249283' account='twinscie' script_path='path/to/script.py' image_name='teste_sif_py310_miniforge3' experiment_name='atena_test' project_path='path/to/mlproject'
+2024-08-08 10:17:08,856 - BigAnchoring-ML-Module.main - DEBUG - mlflow_run_id : fcff2bdc49e94f4395b213135e27ea18
+2024-08-08 10:17:08,856 - BigAnchoring-ML-Module.main - INFO - ---------------------------------------------
+2024-08-08 10:17:08,856 - BigAnchoring-ML-Module.main - INFO - Finalizada a requisicao do status do job!
+2024-08-08 10:17:08,856 - BigAnchoring-ML-Module.main - INFO - ---------------------------------------------
