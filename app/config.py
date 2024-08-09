@@ -15,4 +15,5 @@ class Settings(BaseSettings):
     nfs_root: str = Field(validation_alias='NFS_ROOT')
     sif_root: str = Field(validation_alias='SIF_PATH')
 
+
 settings = Settings()

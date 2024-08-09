@@ -10,6 +10,7 @@ from app.models.token import Token, TokenData
 from app.security_manager import SecManager
 from app.db_manager import DBManager
 from app.task_manager import TaskManager
+from app import file_manager
 
 dbm = DBManager()
 app = FastAPI()
@@ -56,8 +57,10 @@ async def create_task(files: list[UploadFile],
                       usr_token: Annotated[User, Depends(get_current_user)]):
     """Create new task and save it to DB"""
     task_id = utils.create_task_id()
-    task_manager = TaskManager(task_id)
-    await task_manager.process_files(files)
+    await file_manager.process_upload(files, task_id)
+    localf = utils.get_local_folder(task_id)
+    conf_path = f"{localf}/submitter_confs.json"
+    task_manager = TaskManager(task_id, conf_path)
     output = task_manager.run_task()
     dbm.insert_task(output)
     return dbm.get_task_by_id(output['id'])
@@ -84,23 +87,26 @@ async def get_job_status(job_id: int,
     remote.exec(f"squeue -j {job_id} -h --states=all")
     output = remote.get_output()[0]
     job_status = output.split()[4]
-    task = dbm.get_task_by_job_id(job_id)
-    # path_to_search = task['project_path']
-    path_to_search = '/nethome/projetos30/arcabouco_ml/false_NFS/twinscie_folder/measurements_regression_training_right_vinicius'
+    # TODO: update task with current job_status and run_id
+    # task = dbm.get_task_by_job_id(job_id)
+    nfs_folder = '/nethome/projetos30/arcabouco_ml/false_NFS/twinscie_folder'
+    dev_folder = '/measurements_regression_training_right_vinicius'
+    path_to_search = nfs_folder + dev_folder
     run_id = utils.get_mlflow_run_id(path_to_search)
     response_data = {
         "job_status": utils.get_status_message(job_status),
         "run_id": run_id if run_id else "run_id não encontrado"
     }
-
     return response_data
 
 
 @app.get("/users/")
 async def get_users():
+    """Return all users"""
     return dbm.get_users()
 
 
 @app.get("/users/{username}")
 async def get_user(username: str):
+    """Return user given username"""
     return dbm.get_user_by_name(username)

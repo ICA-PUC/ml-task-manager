@@ -3,36 +3,14 @@ import json
 import datetime
 import random
 import os
-from fastapi import status
-from .controllers.ssh.handler import RemoteHandler
 from .config import settings
+from .remote_manager import RemoteManager
 
 
 def load_json(path: str) -> dict:
     """Loads json file and returns as a dictionary"""
     with open(path, encoding='utf-8') as f:
         return json.load(f)
-
-
-def process_config(fpath: str) -> dict:
-    """Process configuration file"""
-    conf = load_json(fpath)
-    filtered_confs = {}
-    cluster_confs = {
-        'atena02': ['instance_type', 'image_name', 'account'],
-        'dev': ['instance_type', 'image_name', 'account']
-    }
-    target_cluster = conf['runner_location']
-    general_confs = ['runner_location', 'dataset_name',
-                     'script_path', 'experiment_name']
-
-    for param in general_confs:
-        filtered_confs[param] = conf[param]
-
-    for param in cluster_confs[target_cluster]:
-        cluster_param = conf['clusters'][target_cluster]['infra_config'][param]
-        filtered_confs[param] = cluster_param
-    return filtered_confs
 
 
 def get_status_message(code: str) -> str:
@@ -106,7 +84,7 @@ def prepare_srm_template(task_dict):
         instance_type=task_dict['instance_type'],
         account=task_dict['account'],
         image_name=task_dict['image_name'],
-        script_name=strip_filename(task_dict['script_path']),
+        zip_name="files.zip",
         dataset_name=task_dict['dataset_name'],
         task_id=task_dict['id'],
         sif_path=settings.sif_root,
@@ -118,33 +96,7 @@ def prepare_srm_template(task_dict):
     return slurm_script
 
 
-# TODO: Create remote handler
-def atena_upload(fname, remote, task_id):
-    """Submit job to atena cluster"""
-    # root = settings.atena_root
-    root = settings.nfs_root
-    folder_destination = 'scripts'
-    file_path = f"{root}/{folder_destination}/{task_id}/{fname}"
-    sanity_check = remote.send_file(fname, file_path, task_id)
-    if not sanity_check:
-        return status.HTTP_500_INTERNAL_SERVER_ERROR
-    return file_path
-
-
-def atena_connect():
-    """Spawn new remote handler with atena config"""
-    remote = RemoteHandler()
-    host = "atn1mg4"
-    user = settings.env_confs['ATENA_USER']
-    passwd = settings.env_confs['ATENA_PASSWD']
-    remote.connect(host, user, passwd)
-    return remote
-
-
-def get_mlflow_run_id(task):
-    # path_to_search = task['project_path']
-    task = '/nethome/projetos30/arcabouco_ml/false_NFS/twinscie_folder/measurements_regression_training_right_vinicius'
-    path_to_search = task
+def get_mlflow_run_id(path_to_search):
     target_file = "run_mlflow_config.txt"
     target_path = f"{path_to_search}/{target_file}"
     files_and_dirs = os.listdir(path_to_search)
@@ -160,3 +112,29 @@ def get_mlflow_run_id(task):
         return run_id
     else:
         return "Arquivo 'run_mlflow_config.txt' não encontrado no diretório."
+
+
+def atena_connect():
+    """Connect to atena cluster using settings"""
+    host = "atn1mg4"
+    user = settings.env_confs['ATENA_USER']
+    passwd = settings.env_confs['ATENA_PASSWD']
+    remote = RemoteManager()
+    remote.connect(host, user, passwd)
+    return remote
+
+
+def get_local_folder(task_id: int) -> str:
+    """Get local folder with the current task files"""
+    root = settings.nfs_root
+    folder_destination = 'scripts'
+    local_folder = f"{root}/{folder_destination}/{str(task_id)}"
+    return local_folder
+
+
+def get_remote_folder(task_id: int) -> str:
+    """Get remote folder with the uploaded task files"""
+    root = settings.nfs_root
+    folder_destination = "uploads"
+    remote_folder = f"{root}/{folder_destination}/{str(task_id)}"
+    return remote_folder

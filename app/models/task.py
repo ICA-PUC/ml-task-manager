@@ -12,7 +12,6 @@ class TaskBase(SQLModel):
     image_name: str
     account: str
     runner_location: str
-    script_path: str
     dataset_name: str
     experiment_name: str
     job_id: int

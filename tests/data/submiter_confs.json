@@ -10,7 +10,6 @@
     "execution_mode": "no-mlflow",
     "experiment_name": "atena_test",
     "project_path": "/nethome/projetos30/arcabouco_ml/false_NFS/twinscie_folder/measurements_regression_training_right/",
-    "script_path": "/nethome/projetos30/arcabouco_ml/lucas/ml-task-manager/tests/data/files.zip",
     "command": "python3 files/test.py",
     "clusters": {
       "dev": {

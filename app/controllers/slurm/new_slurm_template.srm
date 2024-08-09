@@ -16,6 +16,6 @@ JOBNAME=$SLURM_JOB_NAME
 echo "JOBNAME: " $JOBNAME
 
 # TODO: check if container.sif exists
-unzip {script_name}
+unzip {zip_name}
 
 singularity run --nv -B {atena_root} {sif_path}/{image_name}.sif {command}

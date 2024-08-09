@@ -28,7 +28,7 @@ INFO:    Build complete: api.sif
 1. Open `template.env` and add your atena02 user and password.
 2. Run the API using `sbatch run_api.srm`
 3. Check provided node name using `squeue --me` and take note of the node name (e.g `atn1b05n14`)
-4.  Open a browser from within Petrobras Workspace and access `<node_name>:<port>/docs` (e.g `atn1b05n14:8008/docs`), you should see FastAPI's documentation page.
+4. Open a browser from within Petrobras Workspace and access `<node_name>:<port>/docs` (e.g `atn1b05n14:8008/docs`), you should see FastAPI's documentation page.
 
 **NOTE**: If something doesn't work, you can check API logs using `cat log_api.txt`.
 
@@ -127,7 +127,7 @@ Here we will describe how to properly consume the API's routes.
 
 ### `POST /new_task`
 
-In order for the API to create and submit a new task, the user must provide two files within the `multipart` HTTP request: The JSON configuration file and the entrypoint script to be executed.
+In order for the API to create and submit a new task, the user must provide two files within the `multipart` HTTP request: The JSON configuration file and the zipped folder with the required files to run its job.
 
 Here is a sample of the config JSON file and a brief description of the required fields.
 
@@ -142,7 +142,7 @@ Here is a sample of the config JSON file and a brief description of the required
   "model_tracking": true,
   "tracking_uri": "experiments",
   "experiment_name": "atena_test",
-  "script_path": "path/to/script.py",
+  "command": "python3 script.py"
   "clusters": {
     "atena02": {
       "infra_config": {
@@ -158,7 +158,7 @@ Here is a sample of the config JSON file and a brief description of the required
 - **dataset_name**: The name of the dataset `.csv` file.
 - **runner_location**: Name of the target cluster (e.g `atena02`, `aws`, `azure`, etc.)
 - **experiment_name**: Name of the experiment.
-- **script_name**: Name of the entrypoint script.
+- **command**: The bash command to run from job node, e.g, `python3 some_script.py` or `mlflow run ...`.
 - **instance_type**: The kind of slurm instance to host the job.
 - **image_name**: The name of the `.sif` image to run the experiment.
 - **account**: Slurm user and job owner's account name.

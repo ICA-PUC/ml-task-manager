@@ -1,33 +1,46 @@
 """File manager module for all file related logic"""
+import os
+import hashlib
 from fastapi import UploadFile
-from .utils import save_file
+from . import utils
 
 
-class FileManager():
-    """File manager class with file processing methods"""
+async def process_upload(files: list[UploadFile], task_id: int) -> tuple:
+    """Process the received list of files
 
-    def __init__(self):
-        self.py_name = None
-        self.conf_path = None
+    :param files: list of files uploaded
+    :type files: list[UploadFile]
+    :param task_id: task identifier number
+    :type task_id: int
+    :return: name of python file and name of config file
+    :rtype: tuple
+    """
+    local_folder = utils.get_local_folder(task_id)
+    for file in files:
+        fname = file.filename
+        fdata = await file.read()
+        if fname.endswith(".json"):
+            save_file(local_folder, fdata, "submiter_confs.json")
+        elif fname.endswith(".zip"):
+            save_file(local_folder, fdata, "files.zip")
+        else:
+            raise ValueError
 
-    async def process_files(self, files: list[UploadFile],
-                            task_id: int) -> tuple:
-        """Process the received list of files
 
-        :param files: list of files uploaded
-        :type files: list[UploadFile]
-        :param task_id: task identifier number
-        :type task_id: int
-        :return: name of python file and name of config file
-        :rtype: tuple
-        """
-        for file in files:
-            fname = file.filename
-            fdata = await file.read()
-            fpath = save_file(fname, fdata, task_id)
-            if fname.endswith(".json"):
-                self.conf_path = fpath
-            if fname.endswith(".py"):
-                self.py_name = fname
+def strip_filename(file_path: str) -> str:
+    """Strip filename from a path"""
+    return file_path.split('/')[-1]
 
-        return self.py_name, self.conf_path
+
+def save_file(path: str, data: bin, file_name: str) -> str:
+    """Save file to disk"""
+    os.makedirs(path, exist_ok=True)
+    file_path = f"{path}/{file_name}"
+    if isinstance(data, str):
+        data = data.encode('utf-8')
+    with open(file_path, 'wb') as f:
+        f.write(data)
+        with open(f"{file_path}.md5", "wb") as f:
+            hashmd5 = hashlib.md5(data).hexdigest()
+            f.write(hashmd5.encode())
+    return file_path
