@@ -115,14 +115,10 @@ def prepare_srm_template(task_dict):
         project_root=task_dict['project_path'],
         command=task_dict['command']
     )
-    fname = f'slurm_script_{task_dict["id"]}.srm'
-    save_file(fname, slurm_script, task_dict["id"])
-    return fname
+    return slurm_script
 
 
-# Temporary functions that will be replaced into class
-
-
+# TODO: Create remote handler
 def atena_upload(fname, remote, task_id):
     """Submit job to atena cluster"""
     # root = settings.atena_root

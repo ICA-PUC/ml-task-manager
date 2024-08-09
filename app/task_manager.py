@@ -3,7 +3,6 @@ import os
 import datetime
 import random
 import hashlib
-import json
 from fastapi import UploadFile
 from . import utils
 from .config import settings
@@ -18,42 +17,29 @@ class TaskManager():
         self.task_dict = None
         self.conf_path = None
 
-    def _load_json(self, path: str) -> dict:
-        """Loads json file and returns as a dictionary"""
-        with open(path, encoding='utf-8') as f:
-            return json.load(f)
-
     def _strip_filename(self, file_path: str) -> str:
         """Strip filename from a path"""
         return file_path.split('/')[-1]
 
-    async def process_files(self, files: list[UploadFile],
-                            task_id: int) -> tuple:
-        """Process the received list of files
-
-        :param files: list of files uploaded
-        :type files: list[UploadFile]
-        :param task_id: task identifier number
-        :type task_id: int
-        :return: name of python file and name of config file
-        :rtype: tuple
-        """
+    async def process_files(self, files: list[UploadFile]) -> tuple:
+        """Process the received list of files"""
         for file in files:
             fname = file.filename
             fdata = await file.read()
-            fpath = self._save_file(fname, fdata, task_id)
+            fpath = self._save_file(fname, fdata, self.task_id)
             if fname.endswith(".json"):
                 self.conf_path = fpath
             if fname.endswith(".py"):
                 self.py_name = fname
+        self.task_dict = self._process_configuration()
 
-    def _save_file(self, filename: str, filedata: bin, task_id: str) -> str:
+    def _save_file(self, filename: str, filedata: bin) -> str:
         """Save file to disk"""
         root = settings.nfs_root
         folder_destination = 'scripts'
-        fpath = f"{root}/{folder_destination}/{str(task_id)}"
+        fpath = f"{root}/{folder_destination}/{str(self.task_id)}"
         os.makedirs(fpath, exist_ok=True)
-        fpath = f"{root}/scripts/{str(task_id)}/{filename}"
+        fpath = f"{root}/scripts/{str(self.task_id)}/{filename}"
         if isinstance(filedata, str):
             filedata = filedata.encode('utf-8')
         with open(fpath, 'wb') as f:
@@ -65,7 +51,7 @@ class TaskManager():
 
     def _process_configuration(self) -> dict:
         """Process configuration file"""
-        configuration = self._load_json(self.conf_path)
+        configuration = utils.load_json(self.conf_path)
         filtered_configuration = {}
         cluster_configuration = {
             'atena02': ['instance_type', 'image_name', 'account'],
@@ -90,7 +76,7 @@ class TaskManager():
         for key, value in backend_execution_config.items():
             filtered_configuration[key] = value
 
-        print(filtered_configuration)
+        filtered_configuration['id'] = self.task_id
 
         return filtered_configuration
 
@@ -98,16 +84,14 @@ class TaskManager():
         return datetime.datetime.now().strftime('%Y%m%d%H%M%S%f') + f" \
             {random.randint(0, 9999):04d}"
 
-    def _config_task_dict(self):
-        self.task_dict = self._process_configuration()
-        self.task_dict['id'] = self.task_id
-
     def _create_atena_task(self):
         """Create and submit a new task to atena"""
         remote = utils.atena_connect()
         utils.atena_upload(self._strip_filename(
             self.task_dict['script_path']), remote, self.task_dict['id'])
-        srm_name = utils.prepare_srm_template(self.task_dict)
+        srm_template = utils.prepare_srm_template(self.task_dict)
+        fname = f'slurm_script_{self.task_dict["id"]}.srm'
+        srm_name = self._save_file(fname, srm_template)
         srm_path = utils.atena_upload(srm_name, remote, self.task_dict['id'])
         remote.exec(f"sbatch {srm_path}")
         output_tuple = remote.get_output()
@@ -128,7 +112,6 @@ class TaskManager():
 
     def run_task(self):
         """Run a new task"""
-        self._config_task_dict()
         task_output_tuple = self._create_task()
         if task_output_tuple[0]:
             text = task_output_tuple[0].strip()
